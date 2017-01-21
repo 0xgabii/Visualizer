@@ -1,0 +1,21 @@
+body{
+	position:relative;
+	width: 100vw;
+	height: 100vh;
+	background-color: black;		
+}
+
+#visualizer{
+	position:absolute;
+	left:50%;
+	top:50%;
+	width:50%;	
+	height:50%;	
+	transform: translate(-50%,-50%);
+}
+#visualizer > div{
+	position: absolute;
+	bottom: 0;	
+	display: inline-block;
+	background: darkorange;			
+}
