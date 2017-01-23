@@ -6,19 +6,30 @@ body{
 }
 
 #visualizer{	
-	position:relative;
+	position:absolute;
 	left:50%;
 	top:50%;
 	transform: translate(-50%,-50%);
-	width:200px;
-	height:200px;
-	background:red;
-	border-radius: 100%;
+	transition: all 0.1s;
+	will-change: transform;
 }
 
-#visualizer > div{
+#visualizer > div:not(#innerCircle){
 	display: inline-block;
-	position: absolute;	
-	transform-origin:0% 0%;
-	background: darkorange;			
+	position: absolute;		
+	border-radius: 1rem;
+	background: darkorange;	
+	transform-origin:0% 0%;	
+}
+
+#innerCircle{
+	position:absolute;
+	left:50%;
+	top:50%;	
+	width:200px;
+	height:200px;
+	box-sizing: border-box;	
+	border:1px solid red;
+	border-radius: 100%;	
+	transform: translate(-50%,-50%);
 }

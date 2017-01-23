@@ -5,55 +5,59 @@
 
   // Create the analyser
   var analyser = context.createAnalyser();
-  analyser.fftSize = 512;
+  analyser.fftSize = 2048;
   var frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
   // Set up the visualisation elements
-  var circle = 2*Math.PI;
-  var objCount = 150;
+  var circle = 2*Math.PI;  
   var radius = 200;
+  var objWidth = 3;
+  var objCount = 200;  
   var step = circle / objCount;
 
   var parent = $('#visualizer');
+  $('#innerCircle').css({
+    'width':radius*2 - 20,
+    'height':radius*2 - 20
+  });
+
   for (var deg = 0; deg < circle; deg += step) {
     var x = radius*Math.cos(deg);
     var y = radius*Math.sin(deg);
 
+    //minus 90deg
     var rad = deg - 1.57;
 
     $('<div />').css({
       'left': x,
       'top': y,
-      'width':3,      
+      'width':objWidth,      
       'transform': 'rotate(' + rad + 'rad)'
     }).appendTo(parent);
   }
 
-  /*
-  var visualisation = $("#visualisation");
-  var barSpacingPercent = 100 / analyser.frequencyBinCount;
-  for (var i = 0; i < analyser.frequencyBinCount; i++) {
-      $("<div/>").css({
 
-          'left': i * barSpacingPercent + '%',
-          'width': 'calc(' + barSpacingPercent + '% - 10px)'
-      }).appendTo(visualisation);
-  }
-  */
+  var bars = $("#visualizer > div:not(#innerCircle)");
 
-  var bars = $("#visualizer > div:not(#circle) ");
+  var prevValue = 0;
 
-
-
-  // Get the frequency data and update the visualisation
   function update() {
     requestAnimationFrame(update);
 
     analyser.getByteFrequencyData(frequencyData);
 
-    bars.each(function (index, bar) {
-      bar.style.height = 10 + (frequencyData[index] / 3) + 'px';
-    });
+    var totValue = 0;
+
+    bars.each(function (i) {
+      $(this).css({'height':10 + (frequencyData[i] / 5)});
+      totValue += frequencyData[i];
+    });    
+
+    var avgValue = totValue/objCount/100 - 0.3;        
+    
+    if(avgValue > 0.9)
+      parent.css({'transform':'translate(-50%,-50%) scale('+avgValue+')'});
+
   };
 
   // Hook up the audio routing...
