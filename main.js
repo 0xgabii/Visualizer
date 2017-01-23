@@ -19,7 +19,7 @@
   $('#innerCircle').css({
     'width':radius*2 - 20,
     'height':radius*2 - 20
-  });
+  });      
 
   for (var deg = 0; deg < circle; deg += step) {
     var x = radius*Math.cos(deg);
