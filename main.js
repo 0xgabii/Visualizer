@@ -60,9 +60,8 @@
 
   };
 
-  // Hook up the audio routing...
-  // player -> analyser -> speakers
-  // (Do this after the player is ready to play - https://code.google.com/p/chromium/issues/detail?id=112368#c4)
+
+  // player -> analyser -> speakers  
   $("#player").on('canplaythrough', function () {
     var source = context.createMediaElementSource(this);
     source.connect(analyser);
@@ -76,7 +75,6 @@
     $("#player").attr('src', dataFile);
   });
 
-  // Kick it off...
   update();
 
 
