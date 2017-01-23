@@ -1,4 +1,4 @@
-# Audio Visualizer
+# Visualizer
 
 ![v1.0](images/v1.0.png)
 
@@ -6,7 +6,7 @@
 
 ## About
 
-Circular Audio Visualizer
+Circular Music Visualizer
 
 ## Todo
 
