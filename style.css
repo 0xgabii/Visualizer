@@ -1,21 +1,24 @@
-body{
+body{	
 	position:relative;
 	width: 100vw;
 	height: 100vh;
 	background-color: black;		
 }
 
-#visualizer{
-	position:absolute;
+#visualizer{	
+	position:relative;
 	left:50%;
 	top:50%;
-	width:50%;	
-	height:50%;	
 	transform: translate(-50%,-50%);
+	width:200px;
+	height:200px;
+	background:red;
+	border-radius: 100%;
 }
+
 #visualizer > div{
-	position: absolute;
-	bottom: 0;	
 	display: inline-block;
+	position: absolute;	
+	transform-origin:0% 0%;
 	background: darkorange;			
 }

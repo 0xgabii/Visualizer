@@ -5,30 +5,29 @@
 
   // Create the analyser
   var analyser = context.createAnalyser();
-  analyser.fftSize = 128;
+  analyser.fftSize = 512;
   var frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
   // Set up the visualisation elements
-  var circle = 360;
-  var objCount = 60;
-  var radius = 100;
+  var circle = 2*Math.PI;
+  var objCount = 150;
+  var radius = 200;
   var step = circle / objCount;
 
-  var parent = $('#equalizer');
-
+  var parent = $('#visualizer');
   for (var deg = 0; deg < circle; deg += step) {
-    var rad = deg * Math.PI / (circle / 2);
-    var x = Math.cos(rad);
-    var y = Math.sin(rad);
+    var x = radius*Math.cos(deg);
+    var y = radius*Math.sin(deg);
+
+    var rad = deg - 1.57;
 
     $('<div />').css({
-      'left': 200,
-      'top': 200,
-      'width': 10,
-      'transform': 'rotate(' + deg + 'deg)'
+      'left': x,
+      'top': y,
+      'width':3,      
+      'transform': 'rotate(' + rad + 'rad)'
     }).appendTo(parent);
   }
-
 
   /*
   var visualisation = $("#visualisation");
@@ -42,7 +41,7 @@
   }
   */
 
-  var bars = $("#equalizer > div");
+  var bars = $("#visualizer > div:not(#circle) ");
 
 
 
@@ -53,7 +52,7 @@
     analyser.getByteFrequencyData(frequencyData);
 
     bars.each(function (index, bar) {
-      bar.style.height = frequencyData[index] + 'px';
+      bar.style.height = 10 + (frequencyData[index] / 3) + 'px';
     });
   };
 
