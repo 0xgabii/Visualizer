@@ -3,28 +3,20 @@ import React, { Component } from 'react';
 class Visualizer extends Component {
   constructor(props) {
     super(props);
-    this.settings = this.props.settings;    
+
+    this.settings = this.props.settings;
     this.circle = this.settings.circle;
     this.radius = this.settings.radius;
     this.objWidth = this.settings.objWidth;
     this.objCount = this.settings.objCount;
     this.step = this.settings.circle / this.settings.objCount;
-    this.data = this.settings.data;
   }
   componentDidMount() {
     this.props.isMounted();
   }
   componentDidUpdate() {
-
-    const objects = document.querySelectorAll('#visualizer > div:not(#innerCircle)');
-
-    var avg = this.data.reduce((prev, curr, i) => prev + curr) / this.data.length;
-
-
-    for (var i = 0; i < objects.length; i++) {
-      var obj = objects[i];
-      obj.style.height = 10 + this.data[i] / 3;
-    }
+    let newData = this.props.settings.data,
+      avg = newData.reduce((prev, curr, i) => prev + curr) / newData.length;
 
     /*
       var avg = tot / objCount / 100 - 0.25;
@@ -40,6 +32,8 @@ class Visualizer extends Component {
       height: this.radius * 2 - 20
     }
 
+    let newData = this.props.settings.data
+
     let visualObj = [];
 
     for (let deg = 0; deg < this.circle; deg += this.step) {
@@ -48,7 +42,8 @@ class Visualizer extends Component {
         rad = deg - 1.57,//minus 90deg
         styles = {
           left: x,
-          top: y,
+          top: y, 
+          height: 10 + newData[Math.floor(deg/this.step)]/3,
           width: this.objWidth,
           transform: 'rotate(' + rad + 'rad)'
         };

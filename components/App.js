@@ -34,14 +34,14 @@ class App extends Component {
     requestAnimationFrame(this.visualizing);
 
     analyser.getByteFrequencyData(frequencyData);
-    
-    var updated = update(this.state.visualizeSet , {
-      data: {$set: frequencyData}
-    });
 
-    this.setState({visualizeSet: updated});
-    
-    console.log(this.state.visualizeSet.data);
+    this.setState({
+      visualizeSet : update(
+        this.state.visualizeSet,{
+          data: {$set: frequencyData}
+        }
+      )
+    });
   }
   handlePlay(e) {
     let audioContext = this.audioContext,
