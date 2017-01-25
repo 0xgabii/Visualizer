@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import update from 'react-addons-update';
 import Visualizer from './Visualizer';
 import Controller from './Controller';
 
@@ -7,18 +8,18 @@ class App extends Component {
     super(props);
     this.state = {
       src: "//katiebaca.com/tutorial/odd-look.mp3",
-      domObj: [],
       // Set up the visualisation elements
       visualizeSet: {
         circle: 2 * Math.PI,
         radius: 170,
         objWidth: 2,
         objCount: 200,
-        data: [],
+        data: []
       }
     }
     this.handlePlay = this.handlePlay.bind(this);
     this.fileChange = this.fileChange.bind(this);
+    this.visualizing = this.visualizing.bind(this);
 
     // Init Settings
     this.audioContext = new AudioContext();
@@ -27,24 +28,20 @@ class App extends Component {
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
   }
   visualizing() {
-
     let frequencyData = this.frequencyData,
       analyser = this.analyser;
 
     requestAnimationFrame(this.visualizing);
 
     analyser.getByteFrequencyData(frequencyData);
-
-    this.setState({
-      visualizeSet: {
-        circle: 2 * Math.PI,
-        radius: 170,
-        objWidth: 2,
-        objCount: 200,
-        data: frequencyData
-      }
-    });
     
+    var updated = update(this.state.visualizeSet , {
+      data: {$set: frequencyData}
+    });
+
+    this.setState({visualizeSet: updated});
+    
+    console.log(this.state.visualizeSet.data);
   }
   handlePlay(e) {
     let audioContext = this.audioContext,

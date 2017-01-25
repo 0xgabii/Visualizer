@@ -3,21 +3,23 @@ import React, { Component } from 'react';
 class Visualizer extends Component {
   constructor(props) {
     super(props);
-    this.circle = this.props.settings.circle;
-    this.radius = this.props.settings.radius;
-    this.objWidth = this.props.settings.objWidth;
-    this.objCount = this.props.settings.objCount;
-    this.step = this.props.settings.circle / this.props.settings.objCount;
-    this.data = this.props.settings.data;
+    this.settings = this.props.settings;    
+    this.circle = this.settings.circle;
+    this.radius = this.settings.radius;
+    this.objWidth = this.settings.objWidth;
+    this.objCount = this.settings.objCount;
+    this.step = this.settings.circle / this.settings.objCount;
+    this.data = this.settings.data;
   }
   componentDidMount() {
-    //this.props.isMounted();
+    this.props.isMounted();
   }
   componentDidUpdate() {
 
     const objects = document.querySelectorAll('#visualizer > div:not(#innerCircle)');
 
     var avg = this.data.reduce((prev, curr, i) => prev + curr) / this.data.length;
+
 
     for (var i = 0; i < objects.length; i++) {
       var obj = objects[i];
