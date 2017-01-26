@@ -91,16 +91,6 @@ class App extends Component {
             }
           )
         });
-
-        /* this.setState({
-           audioData: {
-             album: album,
-             artist: artist,
-             cover: cover
-           }
-         })*/
-
-        console.log(_this.state.audioData);
       },
       onError: function (error) {
         console.log(':(', error.type, error.info);

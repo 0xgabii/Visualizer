@@ -15,6 +15,7 @@ class Visualizer extends Component {
     // audio Info
     this.data = this.props.data;
     this.album = this.data.album;
+    this.title = this.data.title;
     this.artist = this.data.artist;
     this.cover = this.data.cover;
   }
@@ -37,7 +38,7 @@ class Visualizer extends Component {
     let circleStyle = {
       width: this.radius * 2 - 20,
       height: this.radius * 2 - 20,
-      backgroundImage: 'url(' + this.cover + ')'
+      backgroundImage: 'url(' + this.props.data.cover + ')'
     }
 
     let newData = this.props.settings.data
