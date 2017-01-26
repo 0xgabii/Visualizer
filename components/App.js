@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import update from 'react-addons-update';
 import Visualizer from './Visualizer';
 import Controller from './Controller';
+//get audio file info
+import jsmediatags from 'jsmediatags';
 
 class App extends Component {
   constructor(props) {
@@ -13,8 +15,14 @@ class App extends Component {
         circle: 2 * Math.PI,
         radius: 170,
         objWidth: 2,
-        objCount: 200,
+        objCount: 250,
         data: []
+      },
+      audioData: {
+        album: '',
+        title: '',
+        cover: '',
+        artist: ''
       }
     }
     this.handlePlay = this.handlePlay.bind(this);
@@ -35,10 +43,11 @@ class App extends Component {
 
     analyser.getByteFrequencyData(frequencyData);
 
+    // visualiz object height changed
     this.setState({
-      visualizeSet : update(
-        this.state.visualizeSet,{
-          data: {$set: frequencyData}
+      visualizeSet: update(
+        this.state.visualizeSet, {
+          data: { $set: frequencyData }
         }
       )
     });
@@ -52,8 +61,53 @@ class App extends Component {
     analyser.connect(audioContext.destination);
   }
   fileChange(e) {
-    let file = e.target.files[0],
+    let _this = this,
+      file = e.target.files[0],
       dataFile = URL.createObjectURL(file);
+
+    jsmediatags.read(file, {
+      onSuccess: function (tag) {
+        let tags = tag.tags,
+          album = tags.album,
+          title = tags.title,
+          artist = tags.artist,
+          cover = tags.picture;
+
+        // metaData to Image 
+        let base64String = "";
+        for (let i = 0; i < cover.data.length; i++) {
+          base64String += String.fromCharCode(cover.data[i]);
+        }
+        // base64 dataImage
+        cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
+
+        _this.setState({
+          audioData: update(
+            _this.state.audioData, {
+              album: { $set: album },
+              title: { $set: title },
+              artist: { $set: artist },
+              cover: { $set: cover }
+            }
+          )
+        });
+
+        /* this.setState({
+           audioData: {
+             album: album,
+             artist: artist,
+             cover: cover
+           }
+         })*/
+
+        console.log(_this.state.audioData);
+      },
+      onError: function (error) {
+        console.log(':(', error.type, error.info);
+      }
+    });
+
+
 
     this.setState({ src: dataFile });
   }
@@ -68,6 +122,7 @@ class App extends Component {
         <Visualizer
           isMounted={this.visualizing}
           settings={this.state.visualizeSet}
+          data={this.state.audioData}
           />
       </div>
     );

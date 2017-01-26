@@ -16,8 +16,9 @@ body{
 
 #visualizer > div:not(#innerCircle){
 	display: inline-block;
-	position: absolute;		
-	border-radius: 1rem;
+	position: absolute;	
+	border-bottom-left-radius: 1rem;
+	border-bottom-right-radius: 1rem;		
 	background: darkorange;	
 	transform-origin:0% 0%;	
 }

@@ -11,7 +11,9 @@ module.exports = {
         port: 7777,
         contentBase: __dirname + '/public/'
     },
- 
+    node: {
+        fs: "empty"
+    },
     module: {
             loaders: [
                 {
