@@ -16,8 +16,8 @@ class App extends Component {
       visualizeSet: {
         circle: 2 * Math.PI,
         radius: 200,
-        objWidth: 1,
-        objCount: 300,
+        objWidth: 5,
+        objCount: 150,
         data: []
       },
       audioData: {
@@ -67,13 +67,12 @@ class App extends Component {
     analyser.connect(audioContext.destination);
   }
   fileChange(e) {
-    let _this = this,
-      file = e.target.files[0],
+    let file = e.target.files[0],
       dataFile = URL.createObjectURL(file);
 
     // read Audio metaData
     jsmediatags.read(file, {
-      onSuccess: function (tag) {
+      onSuccess: (tag) => {
         let tags = tag.tags,
           album = tags.album,
           title = tags.title,
@@ -96,9 +95,9 @@ class App extends Component {
           const colorThief = new ColorThief(),
             colorArray = colorThief.getPalette(coverImage, 2);
 
-          _this.setState({
+          this.setState({
             Colors: update(
-              _this.state.Colors, {
+              this.state.Colors, {
                 main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
                 sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
               }
@@ -106,9 +105,9 @@ class App extends Component {
           });
         };
 
-        _this.setState({
+        this.setState({
           audioData: update(
-            _this.state.audioData, {
+            this.state.audioData, {
               album: { $set: album },
               title: { $set: title },
               artist: { $set: artist },
@@ -117,7 +116,7 @@ class App extends Component {
           )
         });
       },
-      onError: function (error) {
+      onError: (error) => {
         console.log(':(', error.type, error.info);
       }
     });
