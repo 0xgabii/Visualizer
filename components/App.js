@@ -121,10 +121,6 @@ class App extends Component {
       }
     });
 
-
-
-
-
     this.setState({ src: dataFile });
   }
   render() {
