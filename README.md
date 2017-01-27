@@ -1,12 +1,12 @@
 # Visualizer
 
-![v1.0](images/v1.0.png)
+![v1.1](images/v1.1.png)
 
 [codepen](https://codepen.io/gomonk/pen/egdwWz)
 
 ## About
 
-Circular Music Visualizer
+Music Visualizer
 
 ## Todo
 
