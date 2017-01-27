@@ -3,21 +3,6 @@ import React, { Component } from 'react';
 class Visualizer extends Component {
   constructor(props) {
     super(props);
-
-    // visualize Settings
-    this.settings = this.props.settings;
-    this.circle = this.settings.circle;
-    this.radius = this.settings.radius;
-    this.objWidth = this.settings.objWidth;
-    this.objCount = this.settings.objCount;
-    this.step = this.settings.circle / this.settings.objCount;
-
-    // audio Info
-    this.data = this.props.data;
-    this.album = this.data.album;
-    this.title = this.data.title;
-    this.artist = this.data.artist;
-    this.cover = this.data.cover;
   }
   componentDidMount() {
     this.props.isMounted();
@@ -35,27 +20,36 @@ class Visualizer extends Component {
     */
   }
   render() {
-    let circleStyle = {
-      width: this.radius * 2 - 20,
-      height: this.radius * 2 - 20,
-      backgroundImage: 'url(' + this.props.data.cover + ')'
+    // style settings
+    let radius = this.props.settings.radius,
+      cover = this.props.data.cover;
+
+    const circleStyle = {
+      width: radius * 2 - 20,
+      height: radius * 2 - 20,
+      backgroundImage: 'url(' + cover + ')'
     }
 
-    let newData = this.props.settings.data
+    // obj visual sets
+    let newData = this.props.settings.data,
+      visualObj = [],
+      objWidth = this.props.settings.objWidth,
+      circle = this.props.settings.circle,
+      step = this.props.settings.circle / this.props.settings.objCount;
 
-    let visualObj = [];
+    for (let deg = 0, i = 0; deg < circle; deg += step, i++) {
 
-    for (let deg = 0, i = 0; deg < this.circle; deg += this.step, i++) {
-      let x = this.radius * Math.cos(deg),
-        y = this.radius * Math.sin(deg),
-        rad = deg - 1.57,//minus 90deg
-        styles = {
-          left: x,
-          top: y,
-          height: 10 + newData[i] / 3,
-          width: this.objWidth,
-          transform: 'rotate(' + rad + 'rad)'
-        };
+      let x = radius * Math.cos(deg),
+        y = radius * Math.sin(deg),
+        rad = deg - 1.57;// minus 90deg
+
+      const styles = {
+        left: x,
+        top: y,
+        height: 10 + newData[i] / 3,
+        width: objWidth,
+        transform: 'rotate(' + rad + 'rad)'
+      };
 
       visualObj.push(
         <div style={styles} ></div>

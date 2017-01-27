@@ -30,7 +30,7 @@ body{
 	width:200px;
 	height:200px;
 	box-sizing: border-box;	
-	border:1px solid red;
+	background-size: cover;
 	border-radius: 100%;	
 	transform: translate(-50%,-50%);
 }
