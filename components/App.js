@@ -4,6 +4,8 @@ import Visualizer from './Visualizer';
 import Controller from './Controller';
 //get audio file info
 import jsmediatags from 'jsmediatags';
+//get main/sub color from dataImage
+import ColorThief from 'color-thief-standalone';
 
 class App extends Component {
   constructor(props) {
@@ -13,9 +15,9 @@ class App extends Component {
       // Set up the visualisation elements
       visualizeSet: {
         circle: 2 * Math.PI,
-        radius: 170,
-        objWidth: 2,
-        objCount: 250,
+        radius: 200,
+        objWidth: 1,
+        objCount: 300,
         data: []
       },
       audioData: {
@@ -23,6 +25,10 @@ class App extends Component {
         title: '',
         cover: '',
         artist: ''
+      },
+      Colors: {
+        main: 'black',
+        sub: 'white'
       }
     }
     this.handlePlay = this.handlePlay.bind(this);
@@ -65,6 +71,7 @@ class App extends Component {
       file = e.target.files[0],
       dataFile = URL.createObjectURL(file);
 
+    // read Audio metaData
     jsmediatags.read(file, {
       onSuccess: function (tag) {
         let tags = tag.tags,
@@ -78,8 +85,26 @@ class App extends Component {
         for (let i = 0; i < cover.data.length; i++) {
           base64String += String.fromCharCode(cover.data[i]);
         }
+
         // base64 dataImage
         cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
+
+        //read Color from dataImage
+        const coverImage = new Image();
+        coverImage.src = cover;
+        coverImage.onload = () => {
+          const colorThief = new ColorThief(),
+            colorArray = colorThief.getPalette(coverImage, 2);
+
+          _this.setState({
+            Colors: update(
+              _this.state.Colors, {
+                main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
+                sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
+              }
+            )
+          });
+        };
 
         _this.setState({
           audioData: update(
@@ -99,17 +124,25 @@ class App extends Component {
 
 
 
+
+
     this.setState({ src: dataFile });
   }
   render() {
+    const styles = {
+      backgroundColor: this.state.Colors.main,
+      backgroundImage: this.state.audioData.cover
+    }
+
     return (
-      <div>
+      <div className="wrapper" style={styles} >
         <Controller
           handlePlay={this.handlePlay}
           src={this.state.src}
           fileChange={this.fileChange}
           />
         <Visualizer
+          color={this.state.Colors.sub}
           isMounted={this.visualizing}
           settings={this.state.visualizeSet}
           data={this.state.audioData}

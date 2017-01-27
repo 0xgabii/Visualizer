@@ -32,8 +32,9 @@ class Visualizer extends Component {
 
     // obj visual sets
     let newData = this.props.settings.data,
-      visualObj = [],
+      visualObj = [],      
       objWidth = this.props.settings.objWidth,
+      color = this.props.color,
       circle = this.props.settings.circle,
       step = this.props.settings.circle / this.props.settings.objCount;
 
@@ -48,6 +49,7 @@ class Visualizer extends Component {
         top: y,
         height: 10 + newData[i] / 3,
         width: objWidth,
+        backgroundColor: color,
         transform: 'rotate(' + rad + 'rad)'
       };
 
