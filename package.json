@@ -18,6 +18,7 @@
     "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
+    "color-thief-standalone": "^1.0.3",
     "jsmediatags": "^3.3.2",
     "react": "^15.4.2",
     "react-addons-update": "^15.4.2",
