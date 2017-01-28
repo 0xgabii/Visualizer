@@ -9,34 +9,31 @@ class Visualizer extends Component {
   }
   componentDidUpdate() {
     let newData = this.props.settings.data,
-      avg = newData.reduce((prev, curr, i) => prev + curr) / newData.length;
+      avg = newData.reduce((prev, curr, i) => prev + curr) / newData.length / 750 + 1;
 
-    /*
-      var avg = tot / objCount / 100 - 0.25;
- 
-      if (avg > 1) {
-        parent.css({ 'transform': 'translate(-50%,-50%) scale(' + avg + ')' });
-      }
-    */
+    if (avg > 1) {
+      document.getElementById('visualizer').style.transform = 'translate(-50%,-50%) scale(' + avg + ')';
+    }
+
   }
   render() {
     // style settings
     let radius = this.props.settings.radius,
       cover = this.props.data.cover;
 
+    // obj visual sets
+    let newData = this.props.settings.data,
+      visualObj = [],
+      objWidth = this.props.settings.objWidth,
+      color = this.props.color,
+      circle = this.props.settings.circle,
+      step = this.props.settings.circle / this.props.settings.objCount;
+
     const circleStyle = {
       width: radius * 2 - 20,
       height: radius * 2 - 20,
       backgroundImage: 'url(' + cover + ')'
     }
-
-    // obj visual sets
-    let newData = this.props.settings.data,
-      visualObj = [],      
-      objWidth = this.props.settings.objWidth,
-      color = this.props.color,
-      circle = this.props.settings.circle,
-      step = this.props.settings.circle / this.props.settings.objCount;
 
     for (let deg = 0, i = 0; deg < circle; deg += step, i++) {
 
@@ -59,11 +56,9 @@ class Visualizer extends Component {
     }
 
     return (
-      <div>
-        <div id="visualizer">
-          <div id="innerCircle" style={circleStyle} ></div>
-          {visualObj}
-        </div>
+      <div id="visualizer">
+        <div id="innerCircle" style={circleStyle} ></div>
+        {visualObj}
       </div>
     );
   }

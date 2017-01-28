@@ -13,8 +13,7 @@ body{
 	position:absolute;
 	left:50%;
 	top:50%;
-	transform: translate(-50%,-50%);
-	transition: all 0.3s;
+	transform: translate(-50%,-50%);	
 	will-change: transform;
 }
 

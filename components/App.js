@@ -15,8 +15,8 @@ class App extends Component {
       // Set up the visualisation elements
       visualizeSet: {
         circle: 2 * Math.PI,
-        radius: 200,
-        objWidth: 5,
+        radius: 250,
+        objWidth: 4,
         objCount: 150,
         data: []
       },
@@ -38,6 +38,7 @@ class App extends Component {
     // Init Settings
     this.audioContext = new AudioContext();
     this.analyser = this.audioContext.createAnalyser();
+    this.analyser.smoothingTimeConstant = 0.7;
     this.analyser.fftSize = 2048;
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
   }
