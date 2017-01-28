@@ -6,12 +6,14 @@ import Controller from './Controller';
 import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
 import ColorThief from 'color-thief-standalone';
+//find lyrics from audioFile
+import Alsong from '../utils/lyrics';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      src: "//katiebaca.com/tutorial/odd-look.mp3",
+      src: "https://uplusion23.github.io/cdn/music/awolnation/sail.mp3",
       // Set up the visualisation elements
       visualizeSet: {
         circle: 2 * Math.PI,
