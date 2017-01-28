@@ -73,10 +73,6 @@ class App extends Component {
     let file = e.target.files[0],
       dataFile = URL.createObjectURL(file);
 
-    alsong(file).then((v) => {
-      console.log(v);
-    });
-
     // read Audio metaData
     jsmediatags.read(file, {
       onSuccess: (tag) => {

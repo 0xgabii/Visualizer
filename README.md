@@ -2,7 +2,7 @@
 
 ![v1.1](images/v1.1.png)
 
-[codepen](https://codepen.io/gomonk/pen/egdwWz)
+[https://gomonk3037.github.io/Visualizer/](https://gomonk3037.github.io/Visualizer/)
 
 ## About
 
