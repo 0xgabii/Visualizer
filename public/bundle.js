@@ -21628,10 +21628,6 @@
 	      var file = e.target.files[0],
 	          dataFile = URL.createObjectURL(file);
 
-	      (0, _alsong2.default)(file).then(function (v) {
-	        console.log(v);
-	      });
-
 	      // read Audio metaData
 	      _jsmediatags2.default.read(file, {
 	        onSuccess: function onSuccess(tag) {
