@@ -18,14 +18,12 @@
     "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
-    "bluebird": "^3.4.7",
+    "alsong": "^1.0.1",
     "color-thief-standalone": "^1.0.3",
     "jsmediatags": "^3.3.2",
     "react": "^15.4.2",
     "react-addons-update": "^15.4.2",
     "react-dom": "^15.4.2",
-    "request": "^2.79.0",
-    "request-promise": "^4.1.1",
-    "xml2js": "^0.4.17"
+    "request": "^2.79.0"
   }
 }

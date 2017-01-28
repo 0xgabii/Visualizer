@@ -7,7 +7,7 @@ import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
 import ColorThief from 'color-thief-standalone';
 //find lyrics from audioFile
-import Alsong from '../utils/lyrics';
+import alsong from 'alsong';
 
 class App extends Component {
   constructor(props) {
@@ -72,6 +72,10 @@ class App extends Component {
   fileChange(e) {
     let file = e.target.files[0],
       dataFile = URL.createObjectURL(file);
+
+    alsong(file).then((v) => {
+      console.log(v);
+    });
 
     // read Audio metaData
     jsmediatags.read(file, {
