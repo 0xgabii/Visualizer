@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import update from 'react-addons-update';
 import Visualizer from './Visualizer';
 import Controller from './Controller';
+import Lyrics from './Lyrics';
 //get audio file info
 import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
@@ -13,11 +14,11 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      src: "https://uplusion23.github.io/cdn/music/awolnation/sail.mp3",
+      src: "//katiebaca.com/tutorial/odd-look.mp3",
       // Set up the visualisation elements
       visualizeSet: {
         circle: 2 * Math.PI,
-        radius: 250,
+        radius: 225,
         objWidth: 4,
         objCount: 150,
         data: []
@@ -28,14 +29,19 @@ class App extends Component {
         cover: '',
         artist: ''
       },
-      Colors: {
+      colors: {
         main: 'black',
         sub: 'white'
+      },
+      lyricSet: {
+        time: 0,
+        lyrics: []
       }
     }
     this.handlePlay = this.handlePlay.bind(this);
     this.fileChange = this.fileChange.bind(this);
     this.visualizing = this.visualizing.bind(this);
+    this.timeUpdate = this.timeUpdate.bind(this);
 
     // Init Settings
     this.audioContext = new AudioContext();
@@ -61,6 +67,18 @@ class App extends Component {
       )
     });
   }
+  timeUpdate(e) {
+    let currentTime = e.target.currentTime;
+    console.log(currentTime);
+
+    this.setState({
+      lyricSet: update(
+        this.state.lyricSet, {
+          time: { $set: currentTime }
+        }
+      )
+    });
+  }
   handlePlay(e) {
     let audioContext = this.audioContext,
       source = audioContext.createMediaElementSource(e.target),
@@ -82,6 +100,18 @@ class App extends Component {
           artist = tags.artist,
           cover = tags.picture;
 
+        // find lyrics
+        alsong(artist, title).then((v) => {
+          this.setState({
+            lyricSet: update(
+              this.state.lyricSet, {
+                lyrics: { $set: v[0] ? v[0].lyric : '' }
+              }
+            )
+          });
+          console.log(v[0] ? v[0].lyric : 'Lyrics Not Found');
+        });
+
         // metaData to Image 
         let base64String = "";
         for (let i = 0; i < cover.data.length; i++) {
@@ -99,8 +129,8 @@ class App extends Component {
             colorArray = colorThief.getPalette(coverImage, 2);
 
           this.setState({
-            Colors: update(
-              this.state.Colors, {
+            colors: update(
+              this.state.colors, {
                 main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
                 sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
               }
@@ -128,7 +158,7 @@ class App extends Component {
   }
   render() {
     const styles = {
-      backgroundColor: this.state.Colors.main,
+      backgroundColor: this.state.colors.main,
       backgroundImage: this.state.audioData.cover
     }
 
@@ -136,14 +166,18 @@ class App extends Component {
       <div className="wrapper" style={styles} >
         <Controller
           handlePlay={this.handlePlay}
+          timeUpdate={this.timeUpdate}
           src={this.state.src}
           fileChange={this.fileChange}
           />
         <Visualizer
-          color={this.state.Colors.sub}
+          color={this.state.colors.sub}
           isMounted={this.visualizing}
           settings={this.state.visualizeSet}
           data={this.state.audioData}
+          />
+        <Lyrics
+          data={this.state.lyricSet.data}
           />
       </div>
     );
