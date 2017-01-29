@@ -35,13 +35,16 @@ class App extends Component {
       },
       lyricSet: {
         time: 0,
-        lyrics: []
-      }
+        lyrics: {},// all lyrics 
+        currentLyrics: []
+      },
+      showLyrics: false
     }
     this.handlePlay = this.handlePlay.bind(this);
     this.fileChange = this.fileChange.bind(this);
     this.visualizing = this.visualizing.bind(this);
     this.timeUpdate = this.timeUpdate.bind(this);
+    this.handleLyricsBtn = this.handleLyricsBtn.bind(this);
 
     // Init Settings
     this.audioContext = new AudioContext();
@@ -68,12 +71,23 @@ class App extends Component {
     });
   }
   timeUpdate(e) {
-    let currentTime = e.target.currentTime;
-    console.log(currentTime);
+    let currentTime = Math.round(e.target.currentTime * 1000);
+    const lyrics_All = this.state.lyricSet.lyrics;
 
+    // find lyrics from state(lyricSet.time)
+    let currentLyricsArray;
+    Object.keys(lyrics_All).map((key, index) => {
+      if (key <= currentTime + 500 && key >= currentTime - 500) {
+        currentLyricsArray = lyrics_All[key];
+        return true;
+      }
+    });
+
+    // update Time && lyrics
     this.setState({
       lyricSet: update(
         this.state.lyricSet, {
+          currentLyrics: { $set: currentLyricsArray ? currentLyricsArray : this.state.lyricSet.currentLyrics },
           time: { $set: currentTime }
         }
       )
@@ -110,6 +124,9 @@ class App extends Component {
             )
           });
           console.log(v[0] ? v[0].lyric : 'Lyrics Not Found');
+          console.log(`title : ${title}`);
+          console.log(`album : ${album}`);
+          console.log(`artist : ${artist}`);
         });
 
         // metaData to Image 
@@ -156,12 +173,14 @@ class App extends Component {
 
     this.setState({ src: dataFile });
   }
+  handleLyricsBtn() {
+    this.setState({ showLyrics: !this.state.showLyrics });
+  }
   render() {
     const styles = {
       backgroundColor: this.state.colors.main,
       backgroundImage: this.state.audioData.cover
     }
-
     return (
       <div className="wrapper" style={styles} >
         <Controller
@@ -169,6 +188,8 @@ class App extends Component {
           timeUpdate={this.timeUpdate}
           src={this.state.src}
           fileChange={this.fileChange}
+          handleLyricsBtn={this.handleLyricsBtn}
+          lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
           />
         <Visualizer
           color={this.state.colors.sub}
@@ -176,9 +197,10 @@ class App extends Component {
           settings={this.state.visualizeSet}
           data={this.state.audioData}
           />
-        <Lyrics
-          data={this.state.lyricSet.data}
-          />
+        {this.state.showLyrics
+          ? <Lyrics data={this.state.lyricSet.currentLyrics} />
+          : ''
+        }
       </div>
     );
   }

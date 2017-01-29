@@ -11,6 +11,7 @@ const Controller = (props) => {
         onCanPlayThrough={props.handlePlay}
         onTimeUpdate={props.timeUpdate}
         ></audio>
+      <button onClick={props.handleLyricsBtn}>{props.lyricsBtnText}</button>
     </div>
   );
 };
