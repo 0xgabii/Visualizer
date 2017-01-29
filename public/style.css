@@ -5,8 +5,8 @@ body{
 .wrapper{
 	position:relative;
 	width: 100vw;
-	height: 100vh;
-	background-color: black;	
+	height: 100vh;	
+	transition: background-color 0.3s 0.15s;
 }
 
 .visualizer{	
@@ -27,6 +27,7 @@ body{
 	border-bottom-left-radius: 1rem;
 	border-bottom-right-radius: 1rem;		
 	transform-origin:0% 0%;	
+	transition: background-color 0.3s 0.15s;
 }
 
 #innerCircle{
@@ -46,14 +47,15 @@ body{
 	left:50%;
 	top:50%;		
 	z-index: 1;
-	font-size:4rem;
+	font-size: 3rem;
 	font-weight: bold;
+	white-space: nowrap;
 	opacity: 0;
 	transform: translate(-50%,-50%) scale(0.5);
 	transition: all 0.3s;	
 }
 .lyrics.showLyrics{
-	left:60%;
+	left: 70%;
 	opacity: 1;
 	transform: translate(-50%,-50%) scale(1);
 }

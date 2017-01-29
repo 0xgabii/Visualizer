@@ -12,6 +12,7 @@ const Controller = (props) => {
         onTimeUpdate={props.timeUpdate}
         ></audio>
       <button onClick={props.handleLyricsBtn}>{props.lyricsBtnText}</button>
+      <button onClick={props.handleFindLyricsBtn}>FindLyrics</button>
     </div>
   );
 };

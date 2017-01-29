@@ -7,12 +7,9 @@ class Lyrics extends Component {
     render() {
         let lyrics = [],
             newData = this.props.data;
-        const styles = {
-            color: this.props.color
-        }
         newData.forEach((value, i) => { lyrics.push(<h1>{value}</h1>) });
         return (
-            <div style={styles} className={this.props.class} >
+            <div className={this.props.class} >
                 {lyrics}
             </div>
         );

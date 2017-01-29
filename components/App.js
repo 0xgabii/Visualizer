@@ -3,6 +3,7 @@ import update from 'react-addons-update';
 import Visualizer from './Visualizer';
 import Controller from './Controller';
 import Lyrics from './Lyrics';
+import FindLyrics from './FindLyrics';
 //get audio file info
 import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
@@ -45,6 +46,10 @@ class App extends Component {
     this.visualizing = this.visualizing.bind(this);
     this.timeUpdate = this.timeUpdate.bind(this);
     this.handleLyricsBtn = this.handleLyricsBtn.bind(this);
+    this.findLyrics = this.findLyrics.bind(this);
+
+    // initialState
+    this.initialState = this.state;
 
     // Init Settings
     this.audioContext = new AudioContext();
@@ -104,6 +109,9 @@ class App extends Component {
   fileChange(e) {
     let file = e.target.files[0],
       dataFile = URL.createObjectURL(file);
+
+    // clean prevState
+    this.setState(this.initialState);
 
     // read Audio metaData
     jsmediatags.read(file, {
@@ -176,8 +184,12 @@ class App extends Component {
   handleLyricsBtn() {
     this.setState({ showLyrics: !this.state.showLyrics });
   }
+  findLyrics(e) {
+    e.preventDefault();
+  }
   render() {
     const styles = {
+      color: this.state.colors.sub,
       backgroundColor: this.state.colors.main,
       backgroundImage: this.state.audioData.cover
     }
@@ -200,8 +212,11 @@ class App extends Component {
           />
         <Lyrics
           class={this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics'}
-          color={this.state.colors.sub}          
+          color={this.state.colors.sub}
           data={this.state.lyricSet.currentLyrics} />
+        <FindLyrics
+          handleSubmit={this.findLyrics}
+          />
       </div>
     );
   }
