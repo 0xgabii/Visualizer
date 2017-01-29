@@ -192,15 +192,16 @@ class App extends Component {
           lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
           />
         <Visualizer
+          class={this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer'}
           color={this.state.colors.sub}
           isMounted={this.visualizing}
           settings={this.state.visualizeSet}
           data={this.state.audioData}
           />
-        {this.state.showLyrics
-          ? <Lyrics data={this.state.lyricSet.currentLyrics} />
-          : ''
-        }
+        <Lyrics
+          class={this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics'}
+          color={this.state.colors.sub}          
+          data={this.state.lyricSet.currentLyrics} />
       </div>
     );
   }

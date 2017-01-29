@@ -9,15 +9,19 @@ body{
 	background-color: black;	
 }
 
-#visualizer{	
+.visualizer{	
 	position:absolute;
 	left:50%;
-	top:50%;
-	transform: translate(-50%,-50%);	
-	will-change: transform;
+	top:50%;		
+	z-index: 2;
+	transition: left 0.3s;
+	will-change: transform;	
+}
+.visualizer.showLyrics{
+	left:25%;
 }
 
-#visualizer > div:not(#innerCircle){
+.visualizer > div:not(#innerCircle){
 	display: inline-block;
 	position: absolute;	
 	border-bottom-left-radius: 1rem;
@@ -35,4 +39,24 @@ body{
 	background-size: cover;
 	border-radius: 100%;	
 	transform: translate(-50%,-50%);
+}
+
+.lyrics{
+	position:absolute;
+	left:50%;
+	top:50%;		
+	z-index: 1;
+	font-size:4rem;
+	font-weight: bold;
+	opacity: 0;
+	transform: translate(-50%,-50%) scale(0.5);
+	transition: all 0.3s;	
+}
+.lyrics.showLyrics{
+	left:60%;
+	opacity: 1;
+	transform: translate(-50%,-50%) scale(1);
+}
+.lyrics > h1{
+	margin: 1rem 0;
 }

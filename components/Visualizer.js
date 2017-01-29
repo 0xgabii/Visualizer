@@ -12,7 +12,7 @@ class Visualizer extends Component {
       avg = newData.reduce((prev, curr, i) => prev + curr) / newData.length / 750 + 1;
 
     if (avg > 1) {
-      document.getElementById('visualizer').style.transform = 'translate(-50%,-50%) scale(' + avg + ')';
+      document.getElementById('visualizer').style.transform = 'scale(' + avg + ')';
     }
 
   }
@@ -56,7 +56,7 @@ class Visualizer extends Component {
     }
 
     return (
-      <div id="visualizer">
+      <div id="visualizer" className={this.props.class}>
         <div id="innerCircle" style={circleStyle} ></div>
         {visualObj}
       </div>
