@@ -1,6 +1,6 @@
 # Visualizer
 
-![v1.2](images/v1.1.png)
+![v1.2](images/v1.2.png)
 
 ##Current Version - 1.2
 (Development) - [https://gomonk3037.github.io/Visualizer/](https://gomonk3037.github.io/Visualizer/)
