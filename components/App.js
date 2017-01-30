@@ -131,11 +131,11 @@ class App extends Component {
             this.setState({
               lyricSet: update(
                 this.state.lyricSet, {
-                  lyrics: { $set: data ? data[0].lyric : '' }
+                  lyrics: { $set: data[0] ? data[0].lyric : '' }
                 }
               )
             });
-            console.log(data ? data[0].lyric : 'Lyrics Not Found');
+            console.log(data[0] ? data[0].lyric : 'Lyrics Not Found');
             console.log(`title : ${title}`);
             console.log(`album : ${album}`);
             console.log(`artist : ${artist}`);

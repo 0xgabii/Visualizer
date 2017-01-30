@@ -9,12 +9,11 @@ class Visualizer extends Component {
   }
   componentDidUpdate() {
     let newData = this.props.settings.data,
-      avg = newData.reduce((prev, curr, i) => prev + curr) / newData.length / 750 + 1;
+      visualizerScale = newData.reduce((prev, curr, i) => prev + curr) / newData.length / 750 + 1;
 
-    if (avg > 1) {
-      document.getElementById('visualizer').style.transform = 'scale(' + avg + ')';
+    if (visualizerScale > 1) {
+      document.getElementById('visualizer').style.transform = `scale(${visualizerScale})`;
     }
-
   }
   render() {
     // style settings

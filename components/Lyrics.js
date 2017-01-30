@@ -8,6 +8,7 @@ class Lyrics extends Component {
         let lyrics = [],
             newData = this.props.data;
         newData.forEach((value, i) => { lyrics.push(<h1>{value}</h1>) });
+
         return (
             <div className={this.props.class} >
                 {lyrics}
