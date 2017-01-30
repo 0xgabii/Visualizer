@@ -50,7 +50,7 @@ class Visualizer extends Component {
       };
 
       visualObj.push(
-        <div style={styles} ></div>
+        <div key={i} style={styles} ></div>
       )
     }
 

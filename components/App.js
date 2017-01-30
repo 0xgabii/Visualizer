@@ -238,7 +238,7 @@ class App extends Component {
           src={this.state.src}
           fileChange={this.fileChange}
           handleLyricsBtn={this.handleLyricsBtn}
-          handleFindLyricsBtn={this.findLyrics}
+          //handleFindLyricsBtn={this.findLyrics}
           handleReversalBtn={this.colorReversal}
           handleMicBtn={this.useMic}
           lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
