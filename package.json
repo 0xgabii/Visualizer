@@ -13,17 +13,15 @@
     "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.22.0",
     "babel-preset-react": "^6.22.0",
-    "json-loader": "^0.5.4",
     "webpack": "^1.14.0",
     "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
-    "alsong": "^1.0.1",
+    "axios": "^0.15.3",
     "color-thief-standalone": "^1.0.3",
     "jsmediatags": "^3.3.2",
     "react": "^15.4.2",
     "react-addons-update": "^15.4.2",
-    "react-dom": "^15.4.2",
-    "request": "^2.79.0"
+    "react-dom": "^15.4.2"
   }
 }

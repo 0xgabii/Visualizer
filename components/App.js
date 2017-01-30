@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import update from 'react-addons-update';
+import axios from 'axios';
 import Visualizer from './Visualizer';
 import Controller from './Controller';
 import Lyrics from './Lyrics';
@@ -8,8 +9,6 @@ import FindLyrics from './FindLyrics';
 import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
 import ColorThief from 'color-thief-standalone';
-//find lyrics from audioFile
-import alsong from 'alsong';
 
 class App extends Component {
   constructor(props) {
@@ -123,19 +122,22 @@ class App extends Component {
           cover = tags.picture;
 
         // find lyrics
-        alsong(artist, title).then((v) => {
-          this.setState({
-            lyricSet: update(
-              this.state.lyricSet, {
-                lyrics: { $set: v[0] ? v[0].lyric : '' }
-              }
-            )
+        axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
+          .then((response) => {
+            let data = response.data;
+            console.log(data);
+            this.setState({
+              lyricSet: update(
+                this.state.lyricSet, {
+                  lyrics: { $set: data ? data[0].lyric : '' }
+                }
+              )
+            });
+            console.log(data ? data[0].lyric : 'Lyrics Not Found');
+            console.log(`title : ${title}`);
+            console.log(`album : ${album}`);
+            console.log(`artist : ${artist}`);
           });
-          console.log(v[0] ? v[0].lyric : 'Lyrics Not Found');
-          console.log(`title : ${title}`);
-          console.log(`album : ${album}`);
-          console.log(`artist : ${artist}`);
-        });
 
         // metaData to Image 
         let base64String = "";
@@ -201,6 +203,7 @@ class App extends Component {
           src={this.state.src}
           fileChange={this.fileChange}
           handleLyricsBtn={this.handleLyricsBtn}
+          handleFindLyricsBtn={this.findLyrics}
           lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
           />
         <Visualizer
