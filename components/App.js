@@ -123,23 +123,7 @@ class App extends Component {
           cover = tags.picture;
 
         // find lyrics
-        axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
-          .then((response) => {
-            let data = response.data;
-            // decending order to Find longest lyric Object
-            data.sort((a, b) => Object.keys(b.lyric).length - Object.keys(a.lyric).length);
-            this.setState({
-              lyricSet: update(
-                this.state.lyricSet, {
-                  lyrics: { $set: data[0] ? data[0].lyric : '' }
-                }
-              )
-            });
-            console.log(data[0] ? data[0].lyric : 'Lyrics Not Found');
-            console.log(`title : ${title}`);
-            console.log(`album : ${album}`);
-            console.log(`artist : ${artist}`);
-          });
+        this.getLyrics(artist, title);
 
         // metaData to Image 
         let base64String = "";
@@ -200,6 +184,27 @@ class App extends Component {
   }
   findLyrics(e) {
     e.preventDefault();
+
+    let artist = e.target.elements[0].value,
+      title = e.target.elements[1].value;
+
+    this.getLyrics(artist, title);    
+  }
+  getLyrics(artist, title) {
+    axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
+      .then((response) => {
+        let data = response.data;
+        // decending order to Find longest lyric Object
+        data.sort((a, b) => Object.keys(b.lyric).length - Object.keys(a.lyric).length);
+        this.setState({
+          lyricSet: update(
+            this.state.lyricSet, {
+              lyrics: { $set: data[0] ? data[0].lyric : this.state.lyricSet.lyrics }
+            }
+          )
+        });
+        alert(data[0] ? 'Lyrics Found!' : 'Lyrics Not Found');
+      });
   }
   render() {
     const styles = {
