@@ -47,6 +47,7 @@ class App extends Component {
     this.handleLyricsBtn = this.handleLyricsBtn.bind(this);
     this.findLyrics = this.findLyrics.bind(this);
     this.colorReversal = this.colorReversal.bind(this);
+    this.useMic = this.useMic.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -57,6 +58,13 @@ class App extends Component {
     this.analyser.smoothingTimeConstant = 0.7;
     this.analyser.fftSize = 2048;
     this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
+
+    // Init Settings - microphone
+    this.acMic = new AudioContext();
+    this.anMic = this.acMic.createAnalyser();
+    this.anMic.smoothingTimeConstant = 0.7;
+    this.anMic.fftSize = 2048;
+    this.frequencyData = new Uint8Array(this.anMic.frequencyBinCount);
   }
   visualizing() {
     let frequencyData = this.frequencyData,
@@ -99,12 +107,22 @@ class App extends Component {
     });
   }
   handlePlay(e) {
-    let audioContext = this.audioContext,
+    const audioContext = this.audioContext,
       source = audioContext.createMediaElementSource(e.target),
       analyser = this.analyser;
 
     source.connect(analyser);
     analyser.connect(audioContext.destination);
+  }
+  useMic() {
+    navigator.getUserMedia({ audio: true }, (stream) => {
+      const audioContext = this.acMic,
+        analyser = this.anMic,
+        microphone = audioContext.createMediaStreamSource(stream);
+
+      microphone.connect(analyser);
+      analyser.connect(audioContext.destination);
+    }, (error) => { console.log(error); });
   }
   fileChange(e) {
     let file = e.target.files[0],
@@ -188,7 +206,7 @@ class App extends Component {
     let artist = e.target.elements[0].value,
       title = e.target.elements[1].value;
 
-    this.getLyrics(artist, title);    
+    this.getLyrics(artist, title);
   }
   getLyrics(artist, title) {
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
@@ -222,6 +240,7 @@ class App extends Component {
           handleLyricsBtn={this.handleLyricsBtn}
           handleFindLyricsBtn={this.findLyrics}
           handleReversalBtn={this.colorReversal}
+          handleMicBtn={this.useMic}
           lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
           />
         <Visualizer
