@@ -13,8 +13,6 @@ module.exports = {
     },
     node: {
         fs: 'empty',
-        net: 'empty',
-        tls: 'empty'
     },
     module: {
         loaders: [
@@ -26,10 +24,6 @@ module.exports = {
                     cacheDirectory: true,
                     presets: ['es2015', 'react']
                 }
-            },
-            {
-                test: /\.json$/,
-                loader: 'json-loader'
             }
         ]
     }
