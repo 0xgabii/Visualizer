@@ -46,6 +46,7 @@ class App extends Component {
     this.timeUpdate = this.timeUpdate.bind(this);
     this.handleLyricsBtn = this.handleLyricsBtn.bind(this);
     this.findLyrics = this.findLyrics.bind(this);
+    this.colorReversal = this.colorReversal.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -125,7 +126,8 @@ class App extends Component {
         axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
           .then((response) => {
             let data = response.data;
-            console.log(data);
+            // decending order to Find longest lyric Object
+            data.sort((a, b) => Object.keys(b.lyric).length - Object.keys(a.lyric).length);
             this.setState({
               lyricSet: update(
                 this.state.lyricSet, {
@@ -186,6 +188,16 @@ class App extends Component {
   handleLyricsBtn() {
     this.setState({ showLyrics: !this.state.showLyrics });
   }
+  colorReversal() {
+    this.setState({
+      colors: update(
+        this.state.colors, {
+          main: { $set: this.state.colors.sub },
+          sub: { $set: this.state.colors.main }
+        }
+      )
+    });
+  }
   findLyrics(e) {
     e.preventDefault();
   }
@@ -204,6 +216,7 @@ class App extends Component {
           fileChange={this.fileChange}
           handleLyricsBtn={this.handleLyricsBtn}
           handleFindLyricsBtn={this.findLyrics}
+          handleReversalBtn={this.colorReversal}
           lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
           />
         <Visualizer

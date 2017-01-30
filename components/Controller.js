@@ -13,6 +13,7 @@ const Controller = (props) => {
         ></audio>
       <button onClick={props.handleLyricsBtn}>{props.lyricsBtnText}</button>
       <button onClick={props.handleFindLyricsBtn}>FindLyrics</button>
+      <button onClick={props.handleReversalBtn}>ColorReversal</button>
     </div>
   );
 };
