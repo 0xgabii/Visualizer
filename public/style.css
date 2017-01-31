@@ -12,14 +12,11 @@ body{
 	transition: background-color 0.3s 0.15s;
 }
 
-header{
-	position: relative;
-}
 #logo{
 	display: inline-block;
 	padding:1.5rem;
 	font-size:3rem;
-	font-weight:bold;
+	font-weight: 100;
 }
 #forkMeImage{
 	position: absolute;
@@ -48,7 +45,6 @@ header{
 .nowPlaying__album{
 	font-size: 1.2rem;	
 }
-
 
 .visualizer{	
 	position:absolute;
@@ -89,7 +85,7 @@ header{
 	top:50%;		
 	z-index: 1;
 	font-size: 3.5rem;
-	font-weight: bold;	
+	font-weight: 100;	
 	text-align: center;
     width: 50vw;
 	opacity: 0;
