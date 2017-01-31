@@ -1,13 +1,15 @@
 # Visualizer
 
-![v1.2](images/v1.2.png)
+![v1.3](images/v1.3.png)
 
-##Current Version - 1.2
+##Current Version - 1.3
 (Development) - [https://gomonk3037.github.io/Visualizer/](https://gomonk3037.github.io/Visualizer/)
 
 ## About
 
-Music Visualizer
+Music Visualizer  + Live Sink lyrics
+
+made by **React**
 
 ## Todo
 
