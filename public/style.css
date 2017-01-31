@@ -27,10 +27,8 @@ body{
 
 .nowPlaying{	
 	position: absolute;
-	left: 50%;
-	bottom: 10%;
-	text-align: center;
-	transform: translateX(-50%);
+	right: 5%;
+	bottom: 5%;	
 }
 .nowPlaying > h3{
 	line-height: 1.5;
