@@ -1,5 +1,8 @@
+@import url(https://cdn.rawgit.com/theeluwin/NotoSansKR-Hestia/master/stylesheets/NotoSansKR-Hestia.css);
+
 body{
 	overflow: hidden;
+	font-family: 'Noto Sans Korean', Helvetica, Arial, sans-serif;
 }
 
 .wrapper{

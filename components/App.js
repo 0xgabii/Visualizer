@@ -91,8 +91,7 @@ class App extends Component {
     let currentLyricsArray;
     Object.keys(lyrics_All).map((key, index) => {
       if (key <= currentTime + 500 && key >= currentTime - 500) {
-        currentLyricsArray = lyrics_All[key];
-        return true;
+        currentLyricsArray = lyrics_All[key];        
       }
     });
 
@@ -208,7 +207,8 @@ class App extends Component {
 
     this.getLyrics(artist, title);
   }
-  getLyrics(artist, title) {
+  getLyrics(artist, title) {    
+    artist = encodeURIComponent(artist), title = encodeURIComponent(title);
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
       .then((response) => {
         let data = response.data;
