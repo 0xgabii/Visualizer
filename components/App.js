@@ -14,7 +14,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      src: "//katiebaca.com/tutorial/odd-look.mp3",
+      src: '',
       // Set up the visualisation elements
       visualizeSet: {
         circle: 2 * Math.PI,
@@ -222,7 +222,8 @@ class App extends Component {
           )
         });
         alert(data[0] ? 'Lyrics Found!' : 'Lyrics Not Found');
-      });
+      })
+      .catch((error) => { this.getLyrics(artist, title) });
   }
   render() {
     const styles = {
