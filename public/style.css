@@ -5,7 +5,18 @@ body{
 	font-family: 'Noto Sans Korean', Helvetica, Arial, sans-serif;
 }
 
+.wrapper{
+	position:relative;
+	width: 100vw;
+	height: 100vh;	
+	transition: background-color 0.3s 0.15s;
+}
+
+header{
+	position: relative;
+}
 #logo{
+	display: inline-block;
 	padding:1.5rem;
 	font-size:3rem;
 	font-weight:bold;
@@ -17,12 +28,27 @@ body{
     border: 0;
 }
 
-.wrapper{
-	position:relative;
-	width: 100vw;
-	height: 100vh;	
-	transition: background-color 0.3s 0.15s;
+.nowPlaying{	
+	position: absolute;
+	left: 50%;
+	bottom: 10%;
+	text-align: center;
+	transform: translateX(-50%);
 }
+.nowPlaying > h3{
+	line-height: 1.5;
+	font-weight: 300;
+}
+.nowPlaying__artist{
+	font-size: 1.35rem;		
+}
+.nowPlaying__title{
+	font-size: 2rem;	
+}
+.nowPlaying__album{
+	font-size: 1.2rem;	
+}
+
 
 .visualizer{	
 	position:absolute;
@@ -79,7 +105,6 @@ body{
 	margin: 1rem 0;
 	line-height: 1.5;
 }
-
 .toast {
 	position: fixed;
 	top: -100px;
@@ -89,8 +114,10 @@ body{
 	z-index: 101;	
 	border-radius: 2px;
 	color: white;
+	font-weight: 100;
 	pointer-events: none;
 	opacity: 0;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 	transform: translateX(-50%) scale(0.7);
 	transition: all 0.4s ease-out;
 }

@@ -1,4 +1,4 @@
-const Toast = (text, state) => {
+const Toast = (html, state) => {
 
   const root = document.getElementById('app'),
     newToast = document.createElement('div');
@@ -7,7 +7,7 @@ const Toast = (text, state) => {
   let time = 0;
 
   newToast.className = `toast ${state}`;
-  newToast.textContent = text;
+  newToast.innerHTML = html;
   root.insertBefore(newToast, root.firstChild);
 
   // add Toast Action
@@ -24,8 +24,6 @@ const Toast = (text, state) => {
       toast[i].style.top = stackMargin + 'px';
       stackMargin += height + topMargin;
     }
-    console.log(stackMargin);
-
   }, time += 100);
 
   // remove Toast Action
@@ -36,10 +34,7 @@ const Toast = (text, state) => {
     newToast.style.opacity = 0;
     newToast.style.left = (winWidth / 2) + width + 'px';
 
-    console.log(winWidth);
-    console.log(width);
-
-  }, time += 3000);
+  }, time += 4000);
 
   // delete Dom
   setTimeout(function () {

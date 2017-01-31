@@ -4,6 +4,7 @@ import axios from 'axios';
 import Visualizer from './Visualizer';
 import Controller from './Controller';
 import Header from './Header';
+import NowPlaying from './NowPlaying';
 import Lyrics from './Lyrics';
 import FindLyrics from './FindLyrics';
 //get audio file info
@@ -51,7 +52,6 @@ class App extends Component {
     this.findLyrics = this.findLyrics.bind(this);
     this.colorReversal = this.colorReversal.bind(this);
     this.useMic = this.useMic.bind(this);
-    this.newToast = this.newToast.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -212,6 +212,9 @@ class App extends Component {
     this.getLyrics(artist, title);
   }
   getLyrics(artist, title) {
+    // Only once
+    if (!this.state.showLyrics) Toast('If you are ASIA resident, searching lyric may be slow', 'default');
+
     artist = encodeURI(artist), title = encodeURI(title);
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
       .then((response) => {
@@ -225,12 +228,9 @@ class App extends Component {
             }
           )
         });
-        alert(data[0] ? 'Lyrics Found!' : 'Lyrics Not Found');
+        data[0] ? Toast('Lyrics Found!', 'success') : Toast('Lyrics Not Found!', 'default');
       })
       .catch((error) => { this.getLyrics(artist, title) });
-  }
-  newToast() {
-    Toast('Lyrics Found!', 'default');
   }
   render() {
     const styles = {
@@ -241,6 +241,7 @@ class App extends Component {
     return (
       <div className="wrapper" style={styles} >
         <Header />
+        <NowPlaying data={this.state.audioData} />
         <Visualizer
           class={this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer'}
           color={this.state.colors.sub}
@@ -261,7 +262,7 @@ class App extends Component {
           src={this.state.src}
           fileChange={this.fileChange}
           handleLyricsBtn={this.handleLyricsBtn}
-          handleFindLyricsBtn={this.newToast}
+          //handleFindLyricsBtn={this.newToast}
           handleReversalBtn={this.colorReversal}
           handleMicBtn={this.useMic}
           lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
