@@ -21566,7 +21566,7 @@
 	    var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
 	    _this.state = {
-	      src: "//katiebaca.com/tutorial/odd-look.mp3",
+	      src: '',
 	      // Set up the visualisation elements
 	      visualizeSet: {
 	        circle: 2 * Math.PI,
@@ -21791,6 +21791,8 @@
 	          })
 	        });
 	        alert(data[0] ? 'Lyrics Found!' : 'Lyrics Not Found');
+	      }).catch(function (error) {
+	        _this4.getLyrics(artist, title);
 	      });
 	    }
 	  }, {
