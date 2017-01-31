@@ -3,6 +3,7 @@ import update from 'react-addons-update';
 import axios from 'axios';
 import Visualizer from './Visualizer';
 import Controller from './Controller';
+import Header from './Header';
 import Lyrics from './Lyrics';
 import FindLyrics from './FindLyrics';
 //get audio file info
@@ -91,7 +92,7 @@ class App extends Component {
     let currentLyricsArray;
     Object.keys(lyrics_All).map((key, index) => {
       if (key <= currentTime + 500 && key >= currentTime - 500) {
-        currentLyricsArray = lyrics_All[key];        
+        currentLyricsArray = lyrics_All[key];
       }
     });
 
@@ -207,8 +208,8 @@ class App extends Component {
 
     this.getLyrics(artist, title);
   }
-  getLyrics(artist, title) {    
-    artist = encodeURIComponent(artist), title = encodeURIComponent(title);
+  getLyrics(artist, title) {
+    artist = encodeURI(artist), title = encodeURI(title);
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
       .then((response) => {
         let data = response.data;
@@ -233,17 +234,7 @@ class App extends Component {
     }
     return (
       <div className="wrapper" style={styles} >
-        <Controller
-          handlePlay={this.handlePlay}
-          timeUpdate={this.timeUpdate}
-          src={this.state.src}
-          fileChange={this.fileChange}
-          handleLyricsBtn={this.handleLyricsBtn}
-          //handleFindLyricsBtn={this.findLyrics}
-          handleReversalBtn={this.colorReversal}
-          handleMicBtn={this.useMic}
-          lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
-          />
+        <Header />
         <Visualizer
           class={this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer'}
           color={this.state.colors.sub}
@@ -257,6 +248,17 @@ class App extends Component {
           data={this.state.lyricSet.currentLyrics} />
         <FindLyrics
           handleSubmit={this.findLyrics}
+          />
+        <Controller
+          handlePlay={this.handlePlay}
+          timeUpdate={this.timeUpdate}
+          src={this.state.src}
+          fileChange={this.fileChange}
+          handleLyricsBtn={this.handleLyricsBtn}
+          //handleFindLyricsBtn={this.findLyrics}
+          handleReversalBtn={this.colorReversal}
+          handleMicBtn={this.useMic}
+          lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
           />
       </div>
     );

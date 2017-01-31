@@ -5,6 +5,18 @@ body{
 	font-family: 'Noto Sans Korean', Helvetica, Arial, sans-serif;
 }
 
+#logo{
+	padding:1.5rem;
+	font-size:3rem;
+	font-weight:bold;
+}
+#forkMeImage{
+	position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
+}
+
 .wrapper{
 	position:relative;
 	width: 100vw;
