@@ -10,6 +10,8 @@ import FindLyrics from './FindLyrics';
 import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
 import ColorThief from 'color-thief-standalone';
+// toast 
+import { Toast } from './Toast';
 
 class App extends Component {
   constructor(props) {
@@ -49,6 +51,7 @@ class App extends Component {
     this.findLyrics = this.findLyrics.bind(this);
     this.colorReversal = this.colorReversal.bind(this);
     this.useMic = this.useMic.bind(this);
+    this.newToast = this.newToast.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -226,6 +229,9 @@ class App extends Component {
       })
       .catch((error) => { this.getLyrics(artist, title) });
   }
+  newToast() {
+    Toast('Lyrics Found!', 'default');
+  }
   render() {
     const styles = {
       color: this.state.colors.sub,
@@ -255,7 +261,7 @@ class App extends Component {
           src={this.state.src}
           fileChange={this.fileChange}
           handleLyricsBtn={this.handleLyricsBtn}
-          //handleFindLyricsBtn={this.findLyrics}
+          handleFindLyricsBtn={this.newToast}
           handleReversalBtn={this.colorReversal}
           handleMicBtn={this.useMic}
           lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}

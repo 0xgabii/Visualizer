@@ -79,3 +79,27 @@ body{
 	margin: 1rem 0;
 	line-height: 1.5;
 }
+
+.toast {
+	position: fixed;
+	top: -100px;
+	left: 50%;
+	padding: 1rem 1.2rem;
+	min-width: 13rem;
+	z-index: 101;	
+	border-radius: 2px;
+	color: white;
+	pointer-events: none;
+	opacity: 0;
+	transform: translateX(-50%) scale(0.7);
+	transition: all 0.4s ease-out;
+}
+.toast.default{
+	background-color: #323232;
+}
+.toast.success{
+	background-color: #8BC34A;
+}
+.toast.alert {
+	background-color: #d93737;
+}
