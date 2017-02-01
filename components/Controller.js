@@ -32,11 +32,11 @@ class Controller extends Component {
           <button style={btn} onClick={this.selectMusic}>Open file</button>
           <audio crossOrigin="anonymous" controls
             src={this.props.src}
-            onCanPlayThrough={this.props.handlePlay}
+            onLoadedData={this.props.handlePlay}
             onTimeUpdate={this.props.timeUpdate}
             ></audio>
           <button style={btn} onClick={this.props.handleLyricsBtn}>{this.props.lyricsBtnText}</button>
-          <button style={btn} onClick={this.props.handleFindLyricsBtn}>Find Lyrics</button>
+          <button style={btn} onClick={this.props.handleFindLyricsBtn}>{this.props.findLyricsBtnText}</button>
           <button style={btn} onClick={this.props.handleReversalBtn}>Color reversal</button>
           <button style={btn} onClick={this.props.handleMicBtn}>Karaoke Mode (Not yet - v1.3 )</button>
         </div>

@@ -205,6 +205,11 @@ class App extends Component {
       )
     });
   }
+  // show form
+  openFindLyrics() {
+    this.setState({ findLyrics: !this.state.findLyrics });
+  }
+  // submit form
   findLyrics(e) {
     e.preventDefault();
 
@@ -213,6 +218,7 @@ class App extends Component {
 
     this.getLyrics(artist, title);
   }
+  // ajax request to Find Lyrics
   getLyrics(artist, title) {
     // alert
     if (!this.state.showLyrics) Toast('If you are ASIA resident, searching lyric may be slow', 'default');
@@ -234,9 +240,6 @@ class App extends Component {
         if (data[0]) this.setState({ showLyrics: true });
       })
       .catch((error) => { this.getLyrics(artist, title) });
-  }
-  openFindLyrics() {
-    this.setState({ findLyrics: !this.state.findLyrics });
   }
   render() {
     const styles = {
@@ -273,6 +276,7 @@ class App extends Component {
           handleFindLyricsBtn={this.openFindLyrics}
           handleReversalBtn={this.colorReversal}
           handleMicBtn={this.useMic}
+          findLyricsBtnText={this.state.findLyrics ? 'Close' : 'Find Lyrics'}
           lyricsBtnText={this.state.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'}
           />
       </div>

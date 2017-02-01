@@ -21777,6 +21777,15 @@
 	        })
 	      });
 	    }
+	    // show form
+
+	  }, {
+	    key: 'openFindLyrics',
+	    value: function openFindLyrics() {
+	      this.setState({ findLyrics: !this.state.findLyrics });
+	    }
+	    // submit form
+
 	  }, {
 	    key: 'findLyrics',
 	    value: function findLyrics(e) {
@@ -21787,6 +21796,8 @@
 
 	      this.getLyrics(artist, title);
 	    }
+	    // ajax request to Find Lyrics
+
 	  }, {
 	    key: 'getLyrics',
 	    value: function getLyrics(artist, title) {
@@ -21812,11 +21823,6 @@
 	      }).catch(function (error) {
 	        _this4.getLyrics(artist, title);
 	      });
-	    }
-	  }, {
-	    key: 'openFindLyrics',
-	    value: function openFindLyrics() {
-	      this.setState({ findLyrics: !this.state.findLyrics });
 	    }
 	  }, {
 	    key: 'render',
@@ -21856,6 +21862,7 @@
 	          handleFindLyricsBtn: this.openFindLyrics,
 	          handleReversalBtn: this.colorReversal,
 	          handleMicBtn: this.useMic,
+	          findLyricsBtnText: this.state.findLyrics ? 'Close' : 'Find Lyrics',
 	          lyricsBtnText: this.state.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'
 	        })
 	      );
@@ -23655,7 +23662,7 @@
 	          ),
 	          _react2.default.createElement('audio', { crossOrigin: 'anonymous', controls: true,
 	            src: this.props.src,
-	            onCanPlayThrough: this.props.handlePlay,
+	            onLoadedData: this.props.handlePlay,
 	            onTimeUpdate: this.props.timeUpdate
 	          }),
 	          _react2.default.createElement(
@@ -23666,7 +23673,7 @@
 	          _react2.default.createElement(
 	            'button',
 	            { style: btn, onClick: this.props.handleFindLyricsBtn },
-	            'Find Lyrics'
+	            this.props.findLyricsBtnText
 	          ),
 	          _react2.default.createElement(
 	            'button',
