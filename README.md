@@ -1,8 +1,8 @@
 # Visualizer
 
-![v1.3](images/v1.3.png)
+![v1.3](images/v1.4.png)
 
-##Current Version - 1.3
+##Current Version - 1.4
 (Development) - [https://gomonk3037.github.io/Visualizer/](https://gomonk3037.github.io/Visualizer/)
 
 ## About
@@ -15,6 +15,6 @@ made by **React**
 
 - ~~ID3, colorthief JS를 이용해 오디오 파일에서 정보 추출~~
 - ~~알송 가사 파싱 : herokuapp이용해 nodejs lyrics서버 생성 ~~
-- HTML5 localStorage 사용해 음악 목록 생성 : 용량 제한(5mb) 때문에 blob데이터를 저장할 순 없음
+- 음악 플레이리스트
 - navigator.getUserMedia 이용 노래방 기능 구현 : 목소리 효과, MR제거, 점수매기기(??)
 

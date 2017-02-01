@@ -21529,21 +21529,31 @@
 
 	var _Controller2 = _interopRequireDefault(_Controller);
 
-	var _Lyrics = __webpack_require__(208);
+	var _Header = __webpack_require__(208);
+
+	var _Header2 = _interopRequireDefault(_Header);
+
+	var _NowPlaying = __webpack_require__(209);
+
+	var _NowPlaying2 = _interopRequireDefault(_NowPlaying);
+
+	var _Lyrics = __webpack_require__(210);
 
 	var _Lyrics2 = _interopRequireDefault(_Lyrics);
 
-	var _FindLyrics = __webpack_require__(209);
+	var _FindLyrics = __webpack_require__(211);
 
 	var _FindLyrics2 = _interopRequireDefault(_FindLyrics);
 
-	var _jsmediatags = __webpack_require__(210);
+	var _jsmediatags = __webpack_require__(212);
 
 	var _jsmediatags2 = _interopRequireDefault(_jsmediatags);
 
-	var _colorThiefStandalone = __webpack_require__(229);
+	var _colorThiefStandalone = __webpack_require__(231);
 
 	var _colorThiefStandalone2 = _interopRequireDefault(_colorThiefStandalone);
+
+	var _Toast = __webpack_require__(232);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21555,6 +21565,8 @@
 	//get audio file info
 
 	//get main/sub color from dataImage
+
+	// toast 
 
 
 	var App = function (_Component) {
@@ -21590,7 +21602,8 @@
 	        lyrics: {}, // all lyrics 
 	        currentLyrics: []
 	      },
-	      showLyrics: false
+	      showLyrics: false,
+	      findLyrics: false
 	    };
 	    _this.handlePlay = _this.handlePlay.bind(_this);
 	    _this.fileChange = _this.fileChange.bind(_this);
@@ -21600,6 +21613,7 @@
 	    _this.findLyrics = _this.findLyrics.bind(_this);
 	    _this.colorReversal = _this.colorReversal.bind(_this);
 	    _this.useMic = _this.useMic.bind(_this);
+	    _this.openFindLyrics = _this.openFindLyrics.bind(_this);
 
 	    // initialState
 	    _this.initialState = _this.state;
@@ -21648,7 +21662,6 @@
 	      Object.keys(lyrics_All).map(function (key, index) {
 	        if (key <= currentTime + 500 && key >= currentTime - 500) {
 	          currentLyricsArray = lyrics_All[key];
-	          return true;
 	        }
 	      });
 
@@ -21779,6 +21792,10 @@
 	    value: function getLyrics(artist, title) {
 	      var _this4 = this;
 
+	      // alert
+	      if (!this.state.showLyrics) (0, _Toast.Toast)('If you are ASIA resident, searching lyric may be slow', 'default');
+
+	      artist = encodeURI(artist), title = encodeURI(title);
 	      _axios2.default.get('https://young-savannah-79010.herokuapp.com/lyrics/' + artist + '/' + title).then(function (response) {
 	        var data = response.data;
 	        // decending order to Find longest lyric Object
@@ -21790,10 +21807,16 @@
 	            lyrics: { $set: data[0] ? data[0].lyric : _this4.state.lyricSet.lyrics }
 	          })
 	        });
-	        alert(data[0] ? 'Lyrics Found!' : 'Lyrics Not Found');
+	        data[0] ? (0, _Toast.Toast)('Lyrics Found!', 'success') : (0, _Toast.Toast)('Lyrics Not Found!', 'default');
+	        if (data[0]) _this4.setState({ showLyrics: true });
 	      }).catch(function (error) {
 	        _this4.getLyrics(artist, title);
 	      });
+	    }
+	  }, {
+	    key: 'openFindLyrics',
+	    value: function openFindLyrics() {
+	      this.setState({ findLyrics: !this.state.findLyrics });
 	    }
 	  }, {
 	    key: 'render',
@@ -21806,17 +21829,8 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'wrapper', style: styles },
-	        _react2.default.createElement(_Controller2.default, {
-	          handlePlay: this.handlePlay,
-	          timeUpdate: this.timeUpdate,
-	          src: this.state.src,
-	          fileChange: this.fileChange,
-	          handleLyricsBtn: this.handleLyricsBtn
-	          //handleFindLyricsBtn={this.findLyrics}
-	          , handleReversalBtn: this.colorReversal,
-	          handleMicBtn: this.useMic,
-	          lyricsBtnText: this.state.showLyrics ? 'hideLyrics' : 'showLyrics'
-	        }),
+	        _react2.default.createElement(_Header2.default, null),
+	        _react2.default.createElement(_NowPlaying2.default, { data: this.state.audioData }),
 	        _react2.default.createElement(_Visualizer2.default, {
 	          'class': this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer',
 	          color: this.state.colors.sub,
@@ -21829,7 +21843,20 @@
 	          color: this.state.colors.sub,
 	          data: this.state.lyricSet.currentLyrics }),
 	        _react2.default.createElement(_FindLyrics2.default, {
+	          'class': this.state.findLyrics ? 'findLyrics active' : 'findLyrics',
 	          handleSubmit: this.findLyrics
+	        }),
+	        _react2.default.createElement(_Controller2.default, {
+	          color: this.state.colors.sub,
+	          handlePlay: this.handlePlay,
+	          timeUpdate: this.timeUpdate,
+	          src: this.state.src,
+	          fileChange: this.fileChange,
+	          handleLyricsBtn: this.handleLyricsBtn,
+	          handleFindLyricsBtn: this.openFindLyrics,
+	          handleReversalBtn: this.colorReversal,
+	          handleMicBtn: this.useMic,
+	          lyricsBtnText: this.state.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'
 	        })
 	      );
 	    }
@@ -23559,6 +23586,112 @@
 /* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Controller = function (_Component) {
+	  _inherits(Controller, _Component);
+
+	  function Controller(props) {
+	    _classCallCheck(this, Controller);
+
+	    var _this = _possibleConstructorReturn(this, (Controller.__proto__ || Object.getPrototypeOf(Controller)).call(this, props));
+
+	    _this.state = {};
+	    _this.selectMusic = _this.selectMusic.bind(_this);
+	    return _this;
+	  }
+	  // open input[file]
+
+
+	  _createClass(Controller, [{
+	    key: 'selectMusic',
+	    value: function selectMusic() {
+	      var file = document.getElementById('audioFile');
+	      file.click();
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var invisible = {
+	        width: 0,
+	        height: 0,
+	        opacity: 0
+	      };
+	      var btn = {
+	        border: '1px solid ' + this.props.color,
+	        color: this.props.color
+	      };
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'music-controller' },
+	        _react2.default.createElement('input', { style: invisible, id: 'audioFile', type: 'file', accept: 'audio/*',
+	          onChange: this.props.fileChange
+	        }),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'btnGroup__controller' },
+	          _react2.default.createElement(
+	            'button',
+	            { style: btn, onClick: this.selectMusic },
+	            'Open file'
+	          ),
+	          _react2.default.createElement('audio', { crossOrigin: 'anonymous', controls: true,
+	            src: this.props.src,
+	            onCanPlayThrough: this.props.handlePlay,
+	            onTimeUpdate: this.props.timeUpdate
+	          }),
+	          _react2.default.createElement(
+	            'button',
+	            { style: btn, onClick: this.props.handleLyricsBtn },
+	            this.props.lyricsBtnText
+	          ),
+	          _react2.default.createElement(
+	            'button',
+	            { style: btn, onClick: this.props.handleFindLyricsBtn },
+	            'Find Lyrics'
+	          ),
+	          _react2.default.createElement(
+	            'button',
+	            { style: btn, onClick: this.props.handleReversalBtn },
+	            'Color reversal'
+	          ),
+	          _react2.default.createElement(
+	            'button',
+	            { style: btn, onClick: this.props.handleMicBtn },
+	            'Karaoke Mode (Not yet - v1.3 )'
+	          )
+	        )
+	      );
+	    }
+	  }]);
+
+	  return Controller;
+	}(_react.Component);
+
+	exports.default = Controller;
+
+/***/ },
+/* 208 */
+/***/ function(module, exports, __webpack_require__) {
+
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
@@ -23571,45 +23704,67 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Controller = function Controller(props) {
+	var Header = function Header(props) {
 	  return _react2.default.createElement(
-	    "div",
-	    { className: "music-controller" },
-	    _react2.default.createElement("input", { type: "file", accept: "audio/*",
-	      onChange: props.fileChange
-	    }),
-	    _react2.default.createElement("audio", { crossOrigin: "anonymous", controls: true,
-	      src: props.src,
-	      onCanPlayThrough: props.handlePlay,
-	      onTimeUpdate: props.timeUpdate
-	    }),
+	    "header",
+	    null,
 	    _react2.default.createElement(
-	      "button",
-	      { onClick: props.handleLyricsBtn },
-	      props.lyricsBtnText
+	      "h1",
+	      { id: "logo" },
+	      "Visualizer"
 	    ),
 	    _react2.default.createElement(
-	      "button",
-	      { onClick: props.handleFindLyricsBtn },
-	      "FindLyrics"
-	    ),
-	    _react2.default.createElement(
-	      "button",
-	      { onClick: props.handleReversalBtn },
-	      "ColorReversal"
-	    ),
-	    _react2.default.createElement(
-	      "button",
-	      { onClick: props.handleMicBtn },
-	      "useMic"
+	      "a",
+	      { href: "https://github.com/gomonk3037/Visualizer", target: "_blank" },
+	      _react2.default.createElement("img", { id: "forkMeImage", src: "https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67", alt: "Fork me on GitHub", "data-canonical-src": "https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" })
 	    )
 	  );
 	};
 
-	exports.default = Controller;
+	exports.default = Header;
 
 /***/ },
-/* 208 */
+/* 209 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var NowPlaying = function NowPlaying(props) {
+	  return _react2.default.createElement(
+	    "div",
+	    { className: "nowPlaying" },
+	    _react2.default.createElement(
+	      "h3",
+	      { className: "nowPlaying__artist" },
+	      props.data.artist
+	    ),
+	    _react2.default.createElement(
+	      "h3",
+	      { className: "nowPlaying__title" },
+	      props.data.title
+	    ),
+	    _react2.default.createElement(
+	      "h3",
+	      { className: "nowPlaying__album" },
+	      props.data.album
+	    )
+	  );
+	};
+
+	exports.default = NowPlaying;
+
+/***/ },
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23672,7 +23827,7 @@
 	exports.default = Lyrics;
 
 /***/ },
-/* 209 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23689,14 +23844,23 @@
 
 	var FindLyrics = function FindLyrics(props) {
 	    return _react2.default.createElement(
-	        "form",
-	        { onSubmit: props.handleSubmit },
-	        _react2.default.createElement("input", { type: "text", name: "artist", placeholder: "artist", required: true }),
-	        _react2.default.createElement("input", { type: "text", name: "title", placeholder: "title", required: true }),
+	        "div",
+	        { className: props.class },
 	        _react2.default.createElement(
-	            "button",
-	            { type: "submit" },
-	            "Find Lyrics"
+	            "h3",
+	            null,
+	            "Find lyrics with Artist and Title"
+	        ),
+	        _react2.default.createElement(
+	            "form",
+	            { onSubmit: props.handleSubmit },
+	            _react2.default.createElement("input", { type: "text", name: "artist", placeholder: "artist", required: true }),
+	            _react2.default.createElement("input", { type: "text", name: "title", placeholder: "title", required: true }),
+	            _react2.default.createElement(
+	                "button",
+	                { type: "submit" },
+	                "Find"
+	            )
 	        )
 	    );
 	};
@@ -23704,20 +23868,20 @@
 	exports.default = FindLyrics;
 
 /***/ },
-/* 210 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
-	const MediaFileReader = __webpack_require__(211);
-	const NodeFileReader = __webpack_require__(213);
-	const XhrFileReader = __webpack_require__(220);
-	const BlobFileReader = __webpack_require__(222);
-	const ArrayFileReader = __webpack_require__(223);
-	const MediaTagReader = __webpack_require__(224);
-	const ID3v1TagReader = __webpack_require__(225);
-	const ID3v2TagReader = __webpack_require__(226);
-	const MP4TagReader = __webpack_require__(228);
+	const MediaFileReader = __webpack_require__(213);
+	const NodeFileReader = __webpack_require__(215);
+	const XhrFileReader = __webpack_require__(222);
+	const BlobFileReader = __webpack_require__(224);
+	const ArrayFileReader = __webpack_require__(225);
+	const MediaTagReader = __webpack_require__(226);
+	const ID3v1TagReader = __webpack_require__(227);
+	const ID3v2TagReader = __webpack_require__(228);
+	const MP4TagReader = __webpack_require__(230);
 
 	var mediaFileReaders = [];
 	var mediaTagReaders = [];
@@ -23958,12 +24122,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 211 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const StringUtils = __webpack_require__(212);
+	const StringUtils = __webpack_require__(214);
 
 	class MediaFileReader {
 
@@ -24160,7 +24324,7 @@
 	module.exports = MediaFileReader;
 
 /***/ },
-/* 212 */
+/* 214 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24269,15 +24433,15 @@
 	module.exports = StringUtils;
 
 /***/ },
-/* 213 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process, Buffer) {'use strict';
 
-	const fs = __webpack_require__(218);
+	const fs = __webpack_require__(220);
 
-	const ChunkedFileData = __webpack_require__(219);
-	const MediaFileReader = __webpack_require__(211);
+	const ChunkedFileData = __webpack_require__(221);
+	const MediaFileReader = __webpack_require__(213);
 
 	class NodeFileReader extends MediaFileReader {
 
@@ -24363,10 +24527,10 @@
 	}
 
 	module.exports = NodeFileReader;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(214).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(216).Buffer))
 
 /***/ },
-/* 214 */
+/* 216 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -24379,9 +24543,9 @@
 
 	'use strict'
 
-	var base64 = __webpack_require__(215)
-	var ieee754 = __webpack_require__(216)
-	var isArray = __webpack_require__(217)
+	var base64 = __webpack_require__(217)
+	var ieee754 = __webpack_require__(218)
+	var isArray = __webpack_require__(219)
 
 	exports.Buffer = Buffer
 	exports.SlowBuffer = SlowBuffer
@@ -26162,7 +26326,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 215 */
+/* 217 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -26282,7 +26446,7 @@
 
 
 /***/ },
-/* 216 */
+/* 218 */
 /***/ function(module, exports) {
 
 	exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -26372,7 +26536,7 @@
 
 
 /***/ },
-/* 217 */
+/* 219 */
 /***/ function(module, exports) {
 
 	var toString = {}.toString;
@@ -26383,13 +26547,13 @@
 
 
 /***/ },
-/* 218 */
+/* 220 */
 /***/ function(module, exports) {
 
 	
 
 /***/ },
-/* 219 */
+/* 221 */
 /***/ function(module, exports) {
 
 	/**
@@ -26588,13 +26752,13 @@
 	module.exports = ChunkedFileData;
 
 /***/ },
-/* 220 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const ChunkedFileData = __webpack_require__(219);
-	const MediaFileReader = __webpack_require__(211);
+	const ChunkedFileData = __webpack_require__(221);
+	const MediaFileReader = __webpack_require__(213);
 
 	const CHUNK_SIZE = 1024;
 
@@ -26856,7 +27020,7 @@
 	  _createXHRObject() {
 	    if (typeof window === "undefined") {
 	      // $FlowIssue - flow is not able to recognize this module.
-	      return new (__webpack_require__(221).XMLHttpRequest)();
+	      return new (__webpack_require__(223).XMLHttpRequest)();
 	    }
 
 	    if (window.XMLHttpRequest) {
@@ -26876,20 +27040,20 @@
 	module.exports = XhrFileReader;
 
 /***/ },
-/* 221 */
+/* 223 */
 /***/ function(module, exports) {
 
 	module.exports = XMLHttpRequest;
 
 
 /***/ },
-/* 222 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const ChunkedFileData = __webpack_require__(219);
-	const MediaFileReader = __webpack_require__(211);
+	const ChunkedFileData = __webpack_require__(221);
+	const MediaFileReader = __webpack_require__(213);
 
 	class BlobFileReader extends MediaFileReader {
 
@@ -26940,12 +27104,12 @@
 	module.exports = BlobFileReader;
 
 /***/ },
-/* 223 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
-	var MediaFileReader = __webpack_require__(211);
+	var MediaFileReader = __webpack_require__(213);
 
 	class ArrayFileReader extends MediaFileReader {
 
@@ -26974,15 +27138,15 @@
 	}
 
 	module.exports = ArrayFileReader;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(214).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(216).Buffer))
 
 /***/ },
-/* 224 */
+/* 226 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const MediaFileReader = __webpack_require__(211);
+	const MediaFileReader = __webpack_require__(213);
 
 	class MediaTagReader {
 
@@ -27079,13 +27243,13 @@
 	module.exports = MediaTagReader;
 
 /***/ },
-/* 225 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(224);
-	var MediaFileReader = __webpack_require__(211);
+	var MediaTagReader = __webpack_require__(226);
+	var MediaFileReader = __webpack_require__(213);
 
 	class ID3v1TagReader extends MediaTagReader {
 	  static getTagIdentifierByteRange() {
@@ -27161,15 +27325,15 @@
 	module.exports = ID3v1TagReader;
 
 /***/ },
-/* 226 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(224);
-	var MediaFileReader = __webpack_require__(211);
-	var ArrayFileReader = __webpack_require__(223);
-	var ID3v2FrameReader = __webpack_require__(227);
+	var MediaTagReader = __webpack_require__(226);
+	var MediaFileReader = __webpack_require__(213);
+	var ArrayFileReader = __webpack_require__(225);
+	var ID3v2FrameReader = __webpack_require__(229);
 
 	const ID3_HEADER_SIZE = 10;
 
@@ -27595,12 +27759,12 @@
 	module.exports = ID3v2TagReader;
 
 /***/ },
-/* 227 */
+/* 229 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaFileReader = __webpack_require__(211);
+	var MediaFileReader = __webpack_require__(213);
 
 	var ID3v2FrameReader = {
 	  getFrameReaderFunction: function (frameId) {
@@ -27773,7 +27937,7 @@
 	module.exports = ID3v2FrameReader;
 
 /***/ },
-/* 228 */
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -27786,8 +27950,8 @@
 	 */
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(224);
-	var MediaFileReader = __webpack_require__(211);
+	var MediaTagReader = __webpack_require__(226);
+	var MediaFileReader = __webpack_require__(213);
 
 	class MP4TagReader extends MediaTagReader {
 	  static getTagIdentifierByteRange() {
@@ -28069,7 +28233,7 @@
 	module.exports = MP4TagReader;
 
 /***/ },
-/* 229 */
+/* 231 */
 /***/ function(module, exports) {
 
 	/*!
@@ -28686,6 +28850,61 @@
 	    };
 	})();
 
+
+/***/ },
+/* 232 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var Toast = function Toast(html, state) {
+
+	  var root = document.getElementById('app'),
+	      newToast = document.createElement('div');
+
+	  // To replace jQuery.queue()
+	  var time = 0;
+
+	  newToast.className = 'toast ' + state;
+	  newToast.innerHTML = html;
+	  root.insertBefore(newToast, root.firstChild);
+
+	  // add Toast Action
+	  setTimeout(function () {
+	    newToast.style.opacity = 1;
+	    newToast.style.transform = 'translateX(-50%) scale(1)';
+
+	    var stackMargin = 15;
+	    var toast = document.querySelectorAll('.toast');
+
+	    for (var i = 0; i < toast.length; i++) {
+	      var height = toast[i].offsetHeight;
+	      var topMargin = 15;
+	      toast[i].style.top = stackMargin + 'px';
+	      stackMargin += height + topMargin;
+	    }
+	  }, time += 100);
+
+	  // remove Toast Action
+	  setTimeout(function () {
+	    var winWidth = window.outerWidth;
+	    var width = newToast.offsetWidth;
+
+	    newToast.style.opacity = 0;
+	    newToast.style.left = winWidth / 2 + width + 'px';
+	  }, time += 4000);
+
+	  // delete Dom
+	  setTimeout(function () {
+	    var parent = newToast.parentNode;
+	    parent.removeChild(newToast);
+	  }, time += 500);
+	};
+
+	exports.Toast = Toast;
 
 /***/ }
 /******/ ]);
