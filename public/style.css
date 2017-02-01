@@ -50,10 +50,14 @@ body{
 
 .music-controller{
 	display: flex;	
-	position: fixed;
+	position: absolute;
 	top: 5%;
 	width: 100%;
-	justify-content: center;
+	flex-direction: column;
+ 	align-items: center;
+}
+.music-controller input[type="file"]{
+	pointer-events: none;
 }
 
 .btnGroup__controller{
@@ -70,29 +74,24 @@ body{
 	border-right: none !important;
 }
 
-.findLyrics{
-	display: inline-block;
+.findLyrics{	
+	position: relative;
+	z-index: -1;
 	opacity: 0;
+	transform: translateY(-3rem) scale(0.7);	
 	transition: all 0.3s;
 }
-.findLyrics.active{
+.findLyrics.show{
+	z-index: 1;	
 	opacity: 1;
+	transform: translateY(0.1rem) scale(1);
 }
-.findLyrics > form{
-	padding: 1rem;
+.findLyrics > input,
+.findLyrics > button{	
+	padding: 0.45rem;
+	outline: none;
 }
-.findLyrics > form > input,
-.findLyrics > form > button{
-	display: block;		
-	margin: 0.5rem 0; 
-	width:100%;
-}
-.findLyrics > form > input{
-	padding: 1rem 1.25rem;
-}
-.findLyrics > form > button{
-	padding: 1rem 1.25rem;
-}
+
 .visualizer{	
 	position:absolute;
 	left:50%;

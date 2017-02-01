@@ -3,9 +3,6 @@ import React, { Component } from 'react';
 class Controller extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-
-    }
     this.selectMusic = this.selectMusic.bind(this);
   }
   // open input[file]
@@ -28,18 +25,23 @@ class Controller extends Component {
         <input style={invisible} id="audioFile" type="file" accept="audio/*"
           onChange={this.props.fileChange}
           />
-        <div className="btnGroup__controller">          
+        <div className="btnGroup__controller">
           <button style={btn} onClick={this.selectMusic}>Open file</button>
           <audio crossOrigin="anonymous" controls
             src={this.props.src}
             onLoadedData={this.props.handlePlay}
             onTimeUpdate={this.props.timeUpdate}
             ></audio>
-          <button style={btn} onClick={this.props.handleLyricsBtn}>{this.props.lyricsBtnText}</button>
-          <button style={btn} onClick={this.props.handleFindLyricsBtn}>{this.props.findLyricsBtnText}</button>
+          <button style={btn} onClick={this.props.handleLyricsBtn}>{this.props.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'}</button>
+          <button style={btn} onClick={this.props.handleFindLyricsBtn}>{this.props.findLyrics ? 'Close' : 'Find Lyrics'}</button>
           <button style={btn} onClick={this.props.handleReversalBtn}>Color reversal</button>
           <button style={btn} onClick={this.props.handleMicBtn}>Karaoke Mode (Not yet - v1.3 )</button>
         </div>
+        <form onSubmit={this.props.handleSubmit} className={this.props.findLyrics ? 'findLyrics show' : 'findLyrics'}>
+          <input type="text" name="artist" placeholder="artist" required />
+          <input type="text" name="title" placeholder="title" required />
+          <button type="submit">Find</button>
+        </form>
       </div>
     );
   }

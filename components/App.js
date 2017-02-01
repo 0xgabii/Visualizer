@@ -6,7 +6,6 @@ import Controller from './Controller';
 import Header from './Header';
 import NowPlaying from './NowPlaying';
 import Lyrics from './Lyrics';
-import FindLyrics from './FindLyrics';
 //get audio file info
 import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
@@ -237,7 +236,7 @@ class App extends Component {
           )
         });
         data[0] ? Toast('Lyrics Found!', 'success') : Toast('Lyrics Not Found!', 'default');
-        if (data[0]) this.setState({ showLyrics: true });
+        if (data[0]) this.setState({ showLyrics: true, findLyrics: false });
       })
       .catch((error) => { this.getLyrics(artist, title) });
   }
@@ -250,7 +249,24 @@ class App extends Component {
     return (
       <div className="wrapper" style={styles} >
         <Header />
-        <NowPlaying data={this.state.audioData} />
+        <Controller
+          color={this.state.colors.sub}
+
+          src={this.state.src}
+          handlePlay={this.handlePlay}
+          timeUpdate={this.timeUpdate}
+          fileChange={this.fileChange}
+
+          handleSubmit={this.findLyrics}
+
+          handleLyricsBtn={this.handleLyricsBtn}
+          handleFindLyricsBtn={this.openFindLyrics}
+          handleReversalBtn={this.colorReversal}
+          handleMicBtn={this.useMic}
+
+          findLyrics={this.state.findLyrics}
+          showLyrics={this.state.showLyrics}
+          />
         <Visualizer
           class={this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer'}
           color={this.state.colors.sub}
@@ -262,23 +278,7 @@ class App extends Component {
           class={this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics'}
           color={this.state.colors.sub}
           data={this.state.lyricSet.currentLyrics} />
-        <FindLyrics
-          class={this.state.findLyrics ? 'findLyrics active' : 'findLyrics'}
-          handleSubmit={this.findLyrics}
-          />
-        <Controller
-          color={this.state.colors.sub}
-          handlePlay={this.handlePlay}
-          timeUpdate={this.timeUpdate}
-          src={this.state.src}
-          fileChange={this.fileChange}
-          handleLyricsBtn={this.handleLyricsBtn}
-          handleFindLyricsBtn={this.openFindLyrics}
-          handleReversalBtn={this.colorReversal}
-          handleMicBtn={this.useMic}
-          findLyricsBtnText={this.state.findLyrics ? 'Close' : 'Find Lyrics'}
-          lyricsBtnText={this.state.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'}
-          />
+        <NowPlaying data={this.state.audioData} />
       </div>
     );
   }
