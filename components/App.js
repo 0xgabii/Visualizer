@@ -42,7 +42,8 @@ class App extends Component {
         lyrics: {},// all lyrics 
         currentLyrics: []
       },
-      showLyrics: false
+      showLyrics: false,
+      findLyrics: false
     }
     this.handlePlay = this.handlePlay.bind(this);
     this.fileChange = this.fileChange.bind(this);
@@ -52,6 +53,7 @@ class App extends Component {
     this.findLyrics = this.findLyrics.bind(this);
     this.colorReversal = this.colorReversal.bind(this);
     this.useMic = this.useMic.bind(this);
+    this.openFindLyrics = this.openFindLyrics.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -212,7 +214,7 @@ class App extends Component {
     this.getLyrics(artist, title);
   }
   getLyrics(artist, title) {
-    // Only once
+    // alert
     if (!this.state.showLyrics) Toast('If you are ASIA resident, searching lyric may be slow', 'default');
 
     artist = encodeURI(artist), title = encodeURI(title);
@@ -229,8 +231,12 @@ class App extends Component {
           )
         });
         data[0] ? Toast('Lyrics Found!', 'success') : Toast('Lyrics Not Found!', 'default');
+        if (data[0]) this.setState({ showLyrics: true });
       })
       .catch((error) => { this.getLyrics(artist, title) });
+  }
+  openFindLyrics() {
+    this.setState({ findLyrics: !this.state.findLyrics });
   }
   render() {
     const styles = {
@@ -254,18 +260,20 @@ class App extends Component {
           color={this.state.colors.sub}
           data={this.state.lyricSet.currentLyrics} />
         <FindLyrics
+          class={this.state.findLyrics ? 'findLyrics active' : 'findLyrics'}
           handleSubmit={this.findLyrics}
           />
         <Controller
+          color={this.state.colors.sub}
           handlePlay={this.handlePlay}
           timeUpdate={this.timeUpdate}
           src={this.state.src}
           fileChange={this.fileChange}
           handleLyricsBtn={this.handleLyricsBtn}
-          //handleFindLyricsBtn={this.newToast}
+          handleFindLyricsBtn={this.openFindLyrics}
           handleReversalBtn={this.colorReversal}
           handleMicBtn={this.useMic}
-          lyricsBtnText={this.state.showLyrics ? 'hideLyrics' : 'showLyrics'}
+          lyricsBtnText={this.state.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'}
           />
       </div>
     );

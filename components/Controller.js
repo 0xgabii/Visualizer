@@ -19,27 +19,27 @@ class Controller extends Component {
       height: 0,
       opacity: 0
     }
+    const btn = {
+      border: '1px solid ' + this.props.color,
+      color: this.props.color
+    }
     return (
       <div className="music-controller">
         <input style={invisible} id="audioFile" type="file" accept="audio/*"
           onChange={this.props.fileChange}
           />
-        <audio crossOrigin="anonymous" controls
-          src={this.props.src}
-          onCanPlayThrough={this.props.handlePlay}
-          onTimeUpdate={this.props.timeUpdate}
-          ></audio>
-        <div className="btnGroup__audio">
-          <button onClick={this.selectMusic}>Select Music</button>
-          <button><i className="material-icons">play_arrow</i></button>
-          <button><i className="material-icons">subtitles</i></button>
+        <div className="btnGroup__controller">          
+          <button style={btn} onClick={this.selectMusic}>Open file</button>
+          <audio crossOrigin="anonymous" controls
+            src={this.props.src}
+            onCanPlayThrough={this.props.handlePlay}
+            onTimeUpdate={this.props.timeUpdate}
+            ></audio>
+          <button style={btn} onClick={this.props.handleLyricsBtn}>{this.props.lyricsBtnText}</button>
+          <button style={btn} onClick={this.props.handleFindLyricsBtn}>Find Lyrics</button>
+          <button style={btn} onClick={this.props.handleReversalBtn}>Color reversal</button>
+          <button style={btn} onClick={this.props.handleMicBtn}>Karaoke Mode (Not yet - v1.3 )</button>
         </div>
-        <div className="btnGroup__controller">
-          <button onClick={this.props.handleLyricsBtn}>{this.props.lyricsBtnText}</button>
-          <button onClick={this.props.handleFindLyricsBtn}>FindLyrics</button>
-          <button onClick={this.props.handleReversalBtn}>ColorReversal</button>
-          <button onClick={this.props.handleMicBtn}><i className="material-icons">mic</i></button>
-        </div> 
       </div>
     );
   }

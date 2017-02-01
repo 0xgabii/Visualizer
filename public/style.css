@@ -1,5 +1,9 @@
 @import url(https://cdn.rawgit.com/theeluwin/NotoSansKR-Hestia/master/stylesheets/NotoSansKR-Hestia.css);
 
+*{
+	box-sizing: border-box;
+}
+
 body{
 	overflow: hidden;
 	font-family: 'Noto Sans Korean', Helvetica, Arial, sans-serif;
@@ -16,7 +20,7 @@ body{
 	display: inline-block;
 	padding:1.5rem;
 	font-size:3rem;
-	font-weight: 100;
+	font-weight: 300;
 }
 #forkMeImage{
 	position: absolute;
@@ -44,6 +48,51 @@ body{
 	font-size: 1.2rem;	
 }
 
+.music-controller{
+	display: flex;	
+	position: fixed;
+	top: 5%;
+	width: 100%;
+	justify-content: center;
+}
+
+.btnGroup__controller{
+	display: flex;
+}
+.btnGroup__controller > button{
+	background-color: transparent;
+	outline: none;
+}
+
+.btnGroup__controller > button:nth-of-type(2),
+.btnGroup__controller > button:nth-of-type(3),
+.btnGroup__controller > button:nth-of-type(4){
+	border-right: none !important;
+}
+
+.findLyrics{
+	display: inline-block;
+	opacity: 0;
+	transition: all 0.3s;
+}
+.findLyrics.active{
+	opacity: 1;
+}
+.findLyrics > form{
+	padding: 1rem;
+}
+.findLyrics > form > input,
+.findLyrics > form > button{
+	display: block;		
+	margin: 0.5rem 0; 
+	width:100%;
+}
+.findLyrics > form > input{
+	padding: 1rem 1.25rem;
+}
+.findLyrics > form > button{
+	padding: 1rem 1.25rem;
+}
 .visualizer{	
 	position:absolute;
 	left:50%;
@@ -83,7 +132,7 @@ body{
 	top:50%;		
 	z-index: 1;
 	font-size: 3.5rem;
-	font-weight: 100;	
+	font-weight: 300;	
 	text-align: center;
     width: 50vw;
 	opacity: 0;
