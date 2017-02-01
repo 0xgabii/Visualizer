@@ -21,6 +21,7 @@ body{
 	padding:1.5rem;
 	font-size:3rem;
 	font-weight: 300;
+	transition: all 0.3s;
 }
 #forkMeImage{
 	position: absolute;
@@ -32,11 +33,12 @@ body{
 .nowPlaying{	
 	position: absolute;
 	right: 5%;
-	bottom: 5%;	
+	bottom: 5%;			
 }
 .nowPlaying > h3{
 	line-height: 1.5;
-	font-weight: 300;
+	font-weight: 300;	
+	transition: all 0.3s;
 }
 .nowPlaying__artist{
 	font-size: 1.35rem;		
@@ -66,6 +68,7 @@ body{
 .btnGroup__controller > button{
 	background-color: transparent;
 	outline: none;
+	transition: all 0.3s;
 }
 
 .btnGroup__controller > button:nth-of-type(2),
@@ -78,6 +81,7 @@ body{
 	position: relative;
 	z-index: -1;
 	opacity: 0;
+	display: flex;
 	transform: translateY(-3rem) scale(0.7);	
 	transition: all 0.3s;
 }
