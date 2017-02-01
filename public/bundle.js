@@ -21541,19 +21541,15 @@
 
 	var _Lyrics2 = _interopRequireDefault(_Lyrics);
 
-	var _FindLyrics = __webpack_require__(211);
-
-	var _FindLyrics2 = _interopRequireDefault(_FindLyrics);
-
-	var _jsmediatags = __webpack_require__(212);
+	var _jsmediatags = __webpack_require__(211);
 
 	var _jsmediatags2 = _interopRequireDefault(_jsmediatags);
 
-	var _colorThiefStandalone = __webpack_require__(231);
+	var _colorThiefStandalone = __webpack_require__(230);
 
 	var _colorThiefStandalone2 = _interopRequireDefault(_colorThiefStandalone);
 
-	var _Toast = __webpack_require__(232);
+	var _Toast = __webpack_require__(231);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21819,7 +21815,7 @@
 	          })
 	        });
 	        data[0] ? (0, _Toast.Toast)('Lyrics Found!', 'success') : (0, _Toast.Toast)('Lyrics Not Found!', 'default');
-	        if (data[0]) _this4.setState({ showLyrics: true });
+	        if (data[0]) _this4.setState({ showLyrics: true, findLyrics: false });
 	      }).catch(function (error) {
 	        _this4.getLyrics(artist, title);
 	      });
@@ -21836,7 +21832,24 @@
 	        'div',
 	        { className: 'wrapper', style: styles },
 	        _react2.default.createElement(_Header2.default, null),
-	        _react2.default.createElement(_NowPlaying2.default, { data: this.state.audioData }),
+	        _react2.default.createElement(_Controller2.default, {
+	          color: this.state.colors.sub,
+
+	          src: this.state.src,
+	          handlePlay: this.handlePlay,
+	          timeUpdate: this.timeUpdate,
+	          fileChange: this.fileChange,
+
+	          handleSubmit: this.findLyrics,
+
+	          handleLyricsBtn: this.handleLyricsBtn,
+	          handleFindLyricsBtn: this.openFindLyrics,
+	          handleReversalBtn: this.colorReversal,
+	          handleMicBtn: this.useMic,
+
+	          findLyrics: this.state.findLyrics,
+	          showLyrics: this.state.showLyrics
+	        }),
 	        _react2.default.createElement(_Visualizer2.default, {
 	          'class': this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer',
 	          color: this.state.colors.sub,
@@ -21848,23 +21861,7 @@
 	          'class': this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics',
 	          color: this.state.colors.sub,
 	          data: this.state.lyricSet.currentLyrics }),
-	        _react2.default.createElement(_FindLyrics2.default, {
-	          'class': this.state.findLyrics ? 'findLyrics active' : 'findLyrics',
-	          handleSubmit: this.findLyrics
-	        }),
-	        _react2.default.createElement(_Controller2.default, {
-	          color: this.state.colors.sub,
-	          handlePlay: this.handlePlay,
-	          timeUpdate: this.timeUpdate,
-	          src: this.state.src,
-	          fileChange: this.fileChange,
-	          handleLyricsBtn: this.handleLyricsBtn,
-	          handleFindLyricsBtn: this.openFindLyrics,
-	          handleReversalBtn: this.colorReversal,
-	          handleMicBtn: this.useMic,
-	          findLyricsBtnText: this.state.findLyrics ? 'Close' : 'Find Lyrics',
-	          lyricsBtnText: this.state.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'
-	        })
+	        _react2.default.createElement(_NowPlaying2.default, { data: this.state.audioData })
 	      );
 	    }
 	  }]);
@@ -23621,7 +23618,6 @@
 
 	    var _this = _possibleConstructorReturn(this, (Controller.__proto__ || Object.getPrototypeOf(Controller)).call(this, props));
 
-	    _this.state = {};
 	    _this.selectMusic = _this.selectMusic.bind(_this);
 	    return _this;
 	  }
@@ -23668,12 +23664,12 @@
 	          _react2.default.createElement(
 	            'button',
 	            { style: btn, onClick: this.props.handleLyricsBtn },
-	            this.props.lyricsBtnText
+	            this.props.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'
 	          ),
 	          _react2.default.createElement(
 	            'button',
 	            { style: btn, onClick: this.props.handleFindLyricsBtn },
-	            this.props.findLyricsBtnText
+	            this.props.findLyrics ? 'Close' : 'Find Lyrics'
 	          ),
 	          _react2.default.createElement(
 	            'button',
@@ -23684,6 +23680,17 @@
 	            'button',
 	            { style: btn, onClick: this.props.handleMicBtn },
 	            'Karaoke Mode (Not yet - v1.3 )'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'form',
+	          { onSubmit: this.props.handleSubmit, className: this.props.findLyrics ? 'findLyrics show' : 'findLyrics' },
+	          _react2.default.createElement('input', { type: 'text', name: 'artist', placeholder: 'artist', required: true }),
+	          _react2.default.createElement('input', { type: 'text', name: 'title', placeholder: 'title', required: true }),
+	          _react2.default.createElement(
+	            'button',
+	            { type: 'submit' },
+	            'Find'
 	          )
 	        )
 	      );
@@ -23837,58 +23844,17 @@
 /* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var FindLyrics = function FindLyrics(props) {
-	    return _react2.default.createElement(
-	        "div",
-	        { className: props.class },
-	        _react2.default.createElement(
-	            "h3",
-	            null,
-	            "Find lyrics with Artist and Title"
-	        ),
-	        _react2.default.createElement(
-	            "form",
-	            { onSubmit: props.handleSubmit },
-	            _react2.default.createElement("input", { type: "text", name: "artist", placeholder: "artist", required: true }),
-	            _react2.default.createElement("input", { type: "text", name: "title", placeholder: "title", required: true }),
-	            _react2.default.createElement(
-	                "button",
-	                { type: "submit" },
-	                "Find"
-	            )
-	        )
-	    );
-	};
-
-	exports.default = FindLyrics;
-
-/***/ },
-/* 212 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
-	const MediaFileReader = __webpack_require__(213);
-	const NodeFileReader = __webpack_require__(215);
-	const XhrFileReader = __webpack_require__(222);
-	const BlobFileReader = __webpack_require__(224);
-	const ArrayFileReader = __webpack_require__(225);
-	const MediaTagReader = __webpack_require__(226);
-	const ID3v1TagReader = __webpack_require__(227);
-	const ID3v2TagReader = __webpack_require__(228);
-	const MP4TagReader = __webpack_require__(230);
+	const MediaFileReader = __webpack_require__(212);
+	const NodeFileReader = __webpack_require__(214);
+	const XhrFileReader = __webpack_require__(221);
+	const BlobFileReader = __webpack_require__(223);
+	const ArrayFileReader = __webpack_require__(224);
+	const MediaTagReader = __webpack_require__(225);
+	const ID3v1TagReader = __webpack_require__(226);
+	const ID3v2TagReader = __webpack_require__(227);
+	const MP4TagReader = __webpack_require__(229);
 
 	var mediaFileReaders = [];
 	var mediaTagReaders = [];
@@ -24129,12 +24095,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 213 */
+/* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const StringUtils = __webpack_require__(214);
+	const StringUtils = __webpack_require__(213);
 
 	class MediaFileReader {
 
@@ -24331,7 +24297,7 @@
 	module.exports = MediaFileReader;
 
 /***/ },
-/* 214 */
+/* 213 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24440,15 +24406,15 @@
 	module.exports = StringUtils;
 
 /***/ },
-/* 215 */
+/* 214 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process, Buffer) {'use strict';
 
-	const fs = __webpack_require__(220);
+	const fs = __webpack_require__(219);
 
-	const ChunkedFileData = __webpack_require__(221);
-	const MediaFileReader = __webpack_require__(213);
+	const ChunkedFileData = __webpack_require__(220);
+	const MediaFileReader = __webpack_require__(212);
 
 	class NodeFileReader extends MediaFileReader {
 
@@ -24534,10 +24500,10 @@
 	}
 
 	module.exports = NodeFileReader;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(216).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(215).Buffer))
 
 /***/ },
-/* 216 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -24550,9 +24516,9 @@
 
 	'use strict'
 
-	var base64 = __webpack_require__(217)
-	var ieee754 = __webpack_require__(218)
-	var isArray = __webpack_require__(219)
+	var base64 = __webpack_require__(216)
+	var ieee754 = __webpack_require__(217)
+	var isArray = __webpack_require__(218)
 
 	exports.Buffer = Buffer
 	exports.SlowBuffer = SlowBuffer
@@ -26333,7 +26299,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 217 */
+/* 216 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -26453,7 +26419,7 @@
 
 
 /***/ },
-/* 218 */
+/* 217 */
 /***/ function(module, exports) {
 
 	exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -26543,7 +26509,7 @@
 
 
 /***/ },
-/* 219 */
+/* 218 */
 /***/ function(module, exports) {
 
 	var toString = {}.toString;
@@ -26554,13 +26520,13 @@
 
 
 /***/ },
-/* 220 */
+/* 219 */
 /***/ function(module, exports) {
 
 	
 
 /***/ },
-/* 221 */
+/* 220 */
 /***/ function(module, exports) {
 
 	/**
@@ -26759,13 +26725,13 @@
 	module.exports = ChunkedFileData;
 
 /***/ },
-/* 222 */
+/* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const ChunkedFileData = __webpack_require__(221);
-	const MediaFileReader = __webpack_require__(213);
+	const ChunkedFileData = __webpack_require__(220);
+	const MediaFileReader = __webpack_require__(212);
 
 	const CHUNK_SIZE = 1024;
 
@@ -27027,7 +26993,7 @@
 	  _createXHRObject() {
 	    if (typeof window === "undefined") {
 	      // $FlowIssue - flow is not able to recognize this module.
-	      return new (__webpack_require__(223).XMLHttpRequest)();
+	      return new (__webpack_require__(222).XMLHttpRequest)();
 	    }
 
 	    if (window.XMLHttpRequest) {
@@ -27047,20 +27013,20 @@
 	module.exports = XhrFileReader;
 
 /***/ },
-/* 223 */
+/* 222 */
 /***/ function(module, exports) {
 
 	module.exports = XMLHttpRequest;
 
 
 /***/ },
-/* 224 */
+/* 223 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const ChunkedFileData = __webpack_require__(221);
-	const MediaFileReader = __webpack_require__(213);
+	const ChunkedFileData = __webpack_require__(220);
+	const MediaFileReader = __webpack_require__(212);
 
 	class BlobFileReader extends MediaFileReader {
 
@@ -27111,12 +27077,12 @@
 	module.exports = BlobFileReader;
 
 /***/ },
-/* 225 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
-	var MediaFileReader = __webpack_require__(213);
+	var MediaFileReader = __webpack_require__(212);
 
 	class ArrayFileReader extends MediaFileReader {
 
@@ -27145,15 +27111,15 @@
 	}
 
 	module.exports = ArrayFileReader;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(216).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(215).Buffer))
 
 /***/ },
-/* 226 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const MediaFileReader = __webpack_require__(213);
+	const MediaFileReader = __webpack_require__(212);
 
 	class MediaTagReader {
 
@@ -27250,13 +27216,13 @@
 	module.exports = MediaTagReader;
 
 /***/ },
-/* 227 */
+/* 226 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(226);
-	var MediaFileReader = __webpack_require__(213);
+	var MediaTagReader = __webpack_require__(225);
+	var MediaFileReader = __webpack_require__(212);
 
 	class ID3v1TagReader extends MediaTagReader {
 	  static getTagIdentifierByteRange() {
@@ -27332,15 +27298,15 @@
 	module.exports = ID3v1TagReader;
 
 /***/ },
-/* 228 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(226);
-	var MediaFileReader = __webpack_require__(213);
-	var ArrayFileReader = __webpack_require__(225);
-	var ID3v2FrameReader = __webpack_require__(229);
+	var MediaTagReader = __webpack_require__(225);
+	var MediaFileReader = __webpack_require__(212);
+	var ArrayFileReader = __webpack_require__(224);
+	var ID3v2FrameReader = __webpack_require__(228);
 
 	const ID3_HEADER_SIZE = 10;
 
@@ -27766,12 +27732,12 @@
 	module.exports = ID3v2TagReader;
 
 /***/ },
-/* 229 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaFileReader = __webpack_require__(213);
+	var MediaFileReader = __webpack_require__(212);
 
 	var ID3v2FrameReader = {
 	  getFrameReaderFunction: function (frameId) {
@@ -27944,7 +27910,7 @@
 	module.exports = ID3v2FrameReader;
 
 /***/ },
-/* 230 */
+/* 229 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -27957,8 +27923,8 @@
 	 */
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(226);
-	var MediaFileReader = __webpack_require__(213);
+	var MediaTagReader = __webpack_require__(225);
+	var MediaFileReader = __webpack_require__(212);
 
 	class MP4TagReader extends MediaTagReader {
 	  static getTagIdentifierByteRange() {
@@ -28240,7 +28206,7 @@
 	module.exports = MP4TagReader;
 
 /***/ },
-/* 231 */
+/* 230 */
 /***/ function(module, exports) {
 
 	/*!
@@ -28859,7 +28825,7 @@
 
 
 /***/ },
-/* 232 */
+/* 231 */
 /***/ function(module, exports) {
 
 	'use strict';
