@@ -21,7 +21,7 @@ body{
 	padding:1.5rem;
 	font-size:3rem;
 	font-weight: 300;
-	transition: all 0.3s;
+	transition: all 0.3s 0.15s;
 }
 #forkMeImage{
 	position: absolute;
@@ -68,7 +68,7 @@ body{
 .btnGroup__controller > button{
 	background-color: transparent;
 	outline: none;
-	transition: all 0.3s;
+	transition: all 0.3s 0.15s;
 }
 
 .btnGroup__controller > button:nth-of-type(2),
@@ -134,22 +134,44 @@ body{
 	left:50%;
 	top:50%;		
 	z-index: 1;
-	font-size: 3.5rem;
+	font-size: 1.75rem;
 	font-weight: 300;	
 	text-align: center;
     width: 50vw;
+	height: 50vh;
+	overflow: hidden;
 	opacity: 0;
 	transform: translate(-50%,-50%) scale(0.5);
-	transition: all 0.3s;	
+	transition: all 0.3s 0.15s;	
+}
+.lyrics:after,
+.lyrics:before{
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 2rem;
+	z-index: 1;
+    filter: blur(15px);
+	background: inherit;	
+}
+.lyrics:after{
+	top:0;
+}
+.lyrics:before{
+	bottom:0;
 }
 .lyrics.showLyrics{
 	left: 70%;
 	opacity: 1;
 	transform: translate(-50%,-50%) scale(1);
 }
-.lyrics > h1{
+.lyrics > div{
+	transition: all 0.15s ease-in-out;
+}
+.lyrics > div > p{
 	margin: 1rem 0;
-	line-height: 1.5;
+	line-height: 1.75;
 }
 .toast {
 	position: fixed;
@@ -161,6 +183,7 @@ body{
 	border-radius: 2px;
 	color: white;
 	font-weight: 100;
+	white-space: nowrap;
 	pointer-events: none;
 	opacity: 0;
 	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);

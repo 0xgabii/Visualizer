@@ -9,7 +9,7 @@ class Visualizer extends Component {
   }
   componentDidUpdate() {
     let newData = this.props.settings.data,
-      visualizerScale = newData.reduce((prev, curr, i) => prev + curr) / newData.length / 750 + 1;
+      visualizerScale = newData.length ? newData.reduce((prev, curr, i) => prev + curr) / newData.length / 750 + 1 : 1;
 
     if (visualizerScale > 1) {
       document.getElementById('visualizer').style.transform = `scale(${visualizerScale})`;

@@ -38,7 +38,7 @@ class App extends Component {
       },
       lyricSet: {
         time: 0,
-        lyrics: {},// all lyrics 
+        lyrics: [],// all lyrics 
         currentLyrics: []
       },
       showLyrics: false,
@@ -47,7 +47,6 @@ class App extends Component {
     this.handlePlay = this.handlePlay.bind(this);
     this.fileChange = this.fileChange.bind(this);
     this.visualizing = this.visualizing.bind(this);
-    this.timeUpdate = this.timeUpdate.bind(this);
     this.handleLyricsBtn = this.handleLyricsBtn.bind(this);
     this.findLyrics = this.findLyrics.bind(this);
     this.colorReversal = this.colorReversal.bind(this);
@@ -88,30 +87,8 @@ class App extends Component {
       )
     });
   }
-  timeUpdate(e) {
-    let currentTime = Math.round(e.target.currentTime * 1000);
-    const lyrics_All = this.state.lyricSet.lyrics;
-
-    // find lyrics from state(lyricSet.time)
-    let currentLyricsArray;
-    Object.keys(lyrics_All).map((key, index) => {
-      if (key <= currentTime + 500 && key >= currentTime - 500) {
-        currentLyricsArray = lyrics_All[key];
-      }
-    });
-
-    // update Time && lyrics
-    this.setState({
-      lyricSet: update(
-        this.state.lyricSet, {
-          currentLyrics: { $set: currentLyricsArray ? currentLyricsArray : this.state.lyricSet.currentLyrics },
-          time: { $set: currentTime }
-        }
-      )
-    });
-  }
   handlePlay(e) {
-    const audioContext = this.audioContext,
+    const audioContext = this.audioContext,      
       source = audioContext.createMediaElementSource(e.target),
       analyser = this.analyser;
 
@@ -147,31 +124,33 @@ class App extends Component {
         // find lyrics
         this.getLyrics(artist, title);
 
-        // metaData to Image 
-        let base64String = "";
-        for (let i = 0; i < cover.data.length; i++) {
-          base64String += String.fromCharCode(cover.data[i]);
+        if (cover) {
+          // metaData to Image 
+          let base64String = "";
+          for (let i = 0; i < cover.data.length; i++) {
+            base64String += String.fromCharCode(cover.data[i]);
+          }
+
+          // base64 dataImage
+          cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
+
+          //read Color from dataImage
+          const coverImage = new Image();
+          coverImage.src = cover;
+          coverImage.onload = () => {
+            const colorThief = new ColorThief(),
+              colorArray = colorThief.getPalette(coverImage, 2);
+
+            this.setState({
+              colors: update(
+                this.state.colors, {
+                  main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
+                  sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
+                }
+              )
+            });
+          };
         }
-
-        // base64 dataImage
-        cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
-
-        //read Color from dataImage
-        const coverImage = new Image();
-        coverImage.src = cover;
-        coverImage.onload = () => {
-          const colorThief = new ColorThief(),
-            colorArray = colorThief.getPalette(coverImage, 2);
-
-          this.setState({
-            colors: update(
-              this.state.colors, {
-                main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
-                sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
-              }
-            )
-          });
-        };
 
         this.setState({
           audioData: update(
@@ -220,25 +199,20 @@ class App extends Component {
   // ajax request to Find Lyrics
   getLyrics(artist, title) {
     // alert
-    if (!this.state.showLyrics) Toast('If you are ASIA resident, searching lyric may be slow', 'default');
-
-    artist = encodeURI(artist), title = encodeURI(title);
+    if (!this.state.showLyrics) Toast('Only lyrics in English can be searched', 'default');
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
       .then((response) => {
         let data = response.data;
-        // decending order to Find longest lyric Object
-        data.sort((a, b) => Object.keys(b.lyric).length - Object.keys(a.lyric).length);
         this.setState({
           lyricSet: update(
             this.state.lyricSet, {
-              lyrics: { $set: data[0] ? data[0].lyric : this.state.lyricSet.lyrics }
+              lyrics: { $set: data ? data.split('\n') : this.state.lyricSet.lyrics }
             }
           )
         });
-        data[0] ? Toast('Lyrics Found!', 'success') : Toast('Lyrics Not Found!', 'default');
-        if (data[0]) this.setState({ showLyrics: true, findLyrics: false });
-      })
-      .catch((error) => { this.getLyrics(artist, title) });
+        data ? Toast('Lyrics Found!', 'success') : Toast('Lyrics Not Found!', 'default');
+        if (data) this.setState({ showLyrics: true, findLyrics: false });
+      }).catch((error) => { console.log(error); });
   }
   render() {
     const styles = {
@@ -254,7 +228,6 @@ class App extends Component {
 
           src={this.state.src}
           handlePlay={this.handlePlay}
-          timeUpdate={this.timeUpdate}
           fileChange={this.fileChange}
 
           handleSubmit={this.findLyrics}
@@ -276,8 +249,8 @@ class App extends Component {
           />
         <Lyrics
           class={this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics'}
-          color={this.state.colors.sub}
-          data={this.state.lyricSet.currentLyrics} />
+          color={this.state.colors.main}
+          data={this.state.lyricSet.lyrics} />
         <NowPlaying data={this.state.audioData} />
       </div>
     );
