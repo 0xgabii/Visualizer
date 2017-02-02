@@ -21595,7 +21595,7 @@
 	      },
 	      lyricSet: {
 	        time: 0,
-	        lyrics: {}, // all lyrics 
+	        lyrics: [], // all lyrics 
 	        currentLyrics: []
 	      },
 	      showLyrics: false,
@@ -21604,7 +21604,6 @@
 	    _this.handlePlay = _this.handlePlay.bind(_this);
 	    _this.fileChange = _this.fileChange.bind(_this);
 	    _this.visualizing = _this.visualizing.bind(_this);
-	    _this.timeUpdate = _this.timeUpdate.bind(_this);
 	    _this.handleLyricsBtn = _this.handleLyricsBtn.bind(_this);
 	    _this.findLyrics = _this.findLyrics.bind(_this);
 	    _this.colorReversal = _this.colorReversal.bind(_this);
@@ -21644,28 +21643,6 @@
 	      this.setState({
 	        visualizeSet: (0, _reactAddonsUpdate2.default)(this.state.visualizeSet, {
 	          data: { $set: frequencyData }
-	        })
-	      });
-	    }
-	  }, {
-	    key: 'timeUpdate',
-	    value: function timeUpdate(e) {
-	      var currentTime = Math.round(e.target.currentTime * 1000);
-	      var lyrics_All = this.state.lyricSet.lyrics;
-
-	      // find lyrics from state(lyricSet.time)
-	      var currentLyricsArray = void 0;
-	      Object.keys(lyrics_All).map(function (key, index) {
-	        if (key <= currentTime + 500 && key >= currentTime - 500) {
-	          currentLyricsArray = lyrics_All[key];
-	        }
-	      });
-
-	      // update Time && lyrics
-	      this.setState({
-	        lyricSet: (0, _reactAddonsUpdate2.default)(this.state.lyricSet, {
-	          currentLyrics: { $set: currentLyricsArray ? currentLyricsArray : this.state.lyricSet.currentLyrics },
-	          time: { $set: currentTime }
 	        })
 	      });
 	    }
@@ -21718,29 +21695,33 @@
 	          // find lyrics
 	          _this3.getLyrics(artist, title);
 
-	          // metaData to Image 
-	          var base64String = "";
-	          for (var i = 0; i < cover.data.length; i++) {
-	            base64String += String.fromCharCode(cover.data[i]);
+	          if (cover) {
+	            (function () {
+	              // metaData to Image 
+	              var base64String = "";
+	              for (var i = 0; i < cover.data.length; i++) {
+	                base64String += String.fromCharCode(cover.data[i]);
+	              }
+
+	              // base64 dataImage
+	              cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
+
+	              //read Color from dataImage
+	              var coverImage = new Image();
+	              coverImage.src = cover;
+	              coverImage.onload = function () {
+	                var colorThief = new _colorThiefStandalone2.default(),
+	                    colorArray = colorThief.getPalette(coverImage, 2);
+
+	                _this3.setState({
+	                  colors: (0, _reactAddonsUpdate2.default)(_this3.state.colors, {
+	                    main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
+	                    sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
+	                  })
+	                });
+	              };
+	            })();
 	          }
-
-	          // base64 dataImage
-	          cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
-
-	          //read Color from dataImage
-	          var coverImage = new Image();
-	          coverImage.src = cover;
-	          coverImage.onload = function () {
-	            var colorThief = new _colorThiefStandalone2.default(),
-	                colorArray = colorThief.getPalette(coverImage, 2);
-
-	            _this3.setState({
-	              colors: (0, _reactAddonsUpdate2.default)(_this3.state.colors, {
-	                main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
-	                sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
-	              })
-	            });
-	          };
 
 	          _this3.setState({
 	            audioData: (0, _reactAddonsUpdate2.default)(_this3.state.audioData, {
@@ -21800,24 +21781,18 @@
 	      var _this4 = this;
 
 	      // alert
-	      if (!this.state.showLyrics) (0, _Toast.Toast)('If you are ASIA resident, searching lyric may be slow', 'default');
-
-	      artist = encodeURI(artist), title = encodeURI(title);
+	      if (!this.state.showLyrics) (0, _Toast.Toast)('Only lyrics in English can be searched', 'default');
 	      _axios2.default.get('https://young-savannah-79010.herokuapp.com/lyrics/' + artist + '/' + title).then(function (response) {
 	        var data = response.data;
-	        // decending order to Find longest lyric Object
-	        data.sort(function (a, b) {
-	          return Object.keys(b.lyric).length - Object.keys(a.lyric).length;
-	        });
 	        _this4.setState({
 	          lyricSet: (0, _reactAddonsUpdate2.default)(_this4.state.lyricSet, {
-	            lyrics: { $set: data[0] ? data[0].lyric : _this4.state.lyricSet.lyrics }
+	            lyrics: { $set: data ? data.split('\n') : _this4.state.lyricSet.lyrics }
 	          })
 	        });
-	        data[0] ? (0, _Toast.Toast)('Lyrics Found!', 'success') : (0, _Toast.Toast)('Lyrics Not Found!', 'default');
-	        if (data[0]) _this4.setState({ showLyrics: true, findLyrics: false });
+	        data ? (0, _Toast.Toast)('Lyrics Found!', 'success') : (0, _Toast.Toast)('Lyrics Not Found!', 'default');
+	        if (data) _this4.setState({ showLyrics: true, findLyrics: false });
 	      }).catch(function (error) {
-	        _this4.getLyrics(artist, title);
+	        console.log(error);
 	      });
 	    }
 	  }, {
@@ -21837,7 +21812,6 @@
 
 	          src: this.state.src,
 	          handlePlay: this.handlePlay,
-	          timeUpdate: this.timeUpdate,
 	          fileChange: this.fileChange,
 
 	          handleSubmit: this.findLyrics,
@@ -21859,8 +21833,8 @@
 	        }),
 	        _react2.default.createElement(_Lyrics2.default, {
 	          'class': this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics',
-	          color: this.state.colors.sub,
-	          data: this.state.lyricSet.currentLyrics }),
+	          color: this.state.colors.main,
+	          data: this.state.lyricSet.lyrics }),
 	        _react2.default.createElement(_NowPlaying2.default, { data: this.state.audioData })
 	      );
 	    }
@@ -23525,9 +23499,9 @@
 	    key: 'componentDidUpdate',
 	    value: function componentDidUpdate() {
 	      var newData = this.props.settings.data,
-	          visualizerScale = newData.reduce(function (prev, curr, i) {
+	          visualizerScale = newData.length ? newData.reduce(function (prev, curr, i) {
 	        return prev + curr;
-	      }) / newData.length / 750 + 1;
+	      }) / newData.length / 750 + 1 : 1;
 
 	      if (visualizerScale > 1) {
 	        document.getElementById('visualizer').style.transform = 'scale(' + visualizerScale + ')';
@@ -23658,8 +23632,7 @@
 	          ),
 	          _react2.default.createElement('audio', { crossOrigin: 'anonymous', controls: true,
 	            src: this.props.src,
-	            onLoadedData: this.props.handlePlay,
-	            onTimeUpdate: this.props.timeUpdate
+	            onLoadedData: this.props.handlePlay
 	          }),
 	          _react2.default.createElement(
 	            'button',
@@ -23804,13 +23777,38 @@
 	var Lyrics = function (_Component) {
 	    _inherits(Lyrics, _Component);
 
-	    function Lyrics() {
+	    function Lyrics(props) {
 	        _classCallCheck(this, Lyrics);
 
-	        return _possibleConstructorReturn(this, (Lyrics.__proto__ || Object.getPrototypeOf(Lyrics)).apply(this, arguments));
+	        var _this = _possibleConstructorReturn(this, (Lyrics.__proto__ || Object.getPrototypeOf(Lyrics)).call(this, props));
+
+	        _this.state = {
+	            scroll: 0.5
+	        };
+	        _this.wheelEvent = _this.wheelEvent.bind(_this);
+	        return _this;
 	    }
 
 	    _createClass(Lyrics, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            var lyrics = document.querySelector('.lyrics');
+	            lyrics.addEventListener('mousewheel', this.wheelEvent);
+	            lyrics.addEventListener('DOMMouseScroll', this.wheelEvent);
+	        }
+	    }, {
+	        key: 'wheelEvent',
+	        value: function wheelEvent(e) {
+	            // e.deltaY > 0 ? Down : Up
+	            var deltaY = e.deltaY > 0 ? -3 : 3;
+
+	            if (this.state.scroll + deltaY <= -100 || this.state.scroll + deltaY >= 1) {
+	                this.setState({ scroll: this.state.scroll });
+	            } else {
+	                this.setState({ scroll: this.state.scroll + deltaY });
+	            }
+	        }
+	    }, {
 	        key: 'shouldComponentUpdate',
 	        value: function shouldComponentUpdate(nextProps, nextState) {
 	            return nextProps !== this.props;
@@ -23820,17 +23818,27 @@
 	        value: function render() {
 	            var lyrics = [],
 	                newData = this.props.data;
+	            var style = {
+	                background: this.props.color
+	            },
+	                scroll = {
+	                transform: 'translateY(' + this.state.scroll + '%)'
+	            };
 	            newData.forEach(function (value, i) {
 	                lyrics.push(_react2.default.createElement(
-	                    'h1',
+	                    'p',
 	                    { key: i },
 	                    value
 	                ));
 	            });
 	            return _react2.default.createElement(
 	                'div',
-	                { className: this.props.class },
-	                lyrics
+	                { style: style, className: this.props.class },
+	                _react2.default.createElement(
+	                    'div',
+	                    { style: scroll },
+	                    lyrics
+	                )
 	            );
 	        }
 	    }]);
