@@ -167,8 +167,7 @@ body{
 	transform: translate(-50%,-50%) scale(1);
 }
 .lyrics > div{
-	transition: all 0.15s ease-in-out;
-	will-change: transform;
+	transition: all 0.15s ease-in-out;	
 }
 .lyrics > div > p{
 	margin: 1rem 0;
