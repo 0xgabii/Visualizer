@@ -7,7 +7,7 @@
 
 ## About
 
-Music Visualizer  + Live Sync lyrics
+Music Visualizer  + Auto Find lyrics
 
 made by **React**
 
