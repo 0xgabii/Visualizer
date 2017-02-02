@@ -142,7 +142,7 @@ body{
 	overflow: hidden;
 	opacity: 0;
 	transform: translate(-50%,-50%) scale(0.5);
-	transition: all 0.3s 0.15s;	
+	transition: background-color 0.3s 0.15s, opacity 0.3s, transform 0.3s, left 0.3s;
 }
 .lyrics:after,
 .lyrics:before{
@@ -168,6 +168,7 @@ body{
 }
 .lyrics > div{
 	transition: all 0.15s ease-in-out;
+	will-change: transform;
 }
 .lyrics > div > p{
 	margin: 1rem 0;

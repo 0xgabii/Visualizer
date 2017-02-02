@@ -88,7 +88,7 @@ class App extends Component {
     });
   }
   handlePlay(e) {
-    const audioContext = this.audioContext,      
+    const audioContext = this.audioContext,
       source = audioContext.createMediaElementSource(e.target),
       analyser = this.analyser;
 
