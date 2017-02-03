@@ -22,7 +22,7 @@ class Controller extends Component {
     }
     return (
       <div className="music-controller">
-        <input style={invisible} id="audioFile" type="file" accept="audio/*"
+        <input style={invisible} id="audioFile" type="file" accept="audio/*" multiple
           onChange={this.props.fileChange}
           />
         <div className="btnGroup__controller">

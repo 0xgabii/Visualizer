@@ -35,7 +35,8 @@ class App extends Component {
       colors: {
         main: 'black',
         sub: 'white'
-      },       
+      },
+      playlist: [],
       showLyrics: false,
       findLyrics: false,
       lyrics: [],
@@ -105,69 +106,74 @@ class App extends Component {
     }, (error) => { console.log(error); });
   }
   fileChange(e) {
-    let file = e.target.files[0],
-      dataFile = URL.createObjectURL(file);
+    const files = e.target.files;
 
-    // clean prevState
-    this.setState(this.initialState);
+    for (var i = 0; i < files.length; i++) {
+      let file = files[i],
+        dataFile = URL.createObjectURL(file);
 
-    // read Audio metaData
-    jsmediatags.read(file, {
-      onSuccess: (tag) => {
-        let tags = tag.tags,
-          album = tags.album,
-          title = tags.title,
-          artist = tags.artist,
-          cover = tags.picture;
+      // clean prevState
+      //this.setState(this.initialState);
 
-        // find lyrics
-        this.getLyrics(artist, title);
+      // read Audio metaData
+      jsmediatags.read(file, {
+        onSuccess: (tag) => {
+          let tags = tag.tags,
+            album = tags.album,
+            title = tags.title,
+            artist = tags.artist,
+            cover = tags.picture;
 
-        if (cover) {
-          // metaData to Image 
-          let base64String = "";
-          for (let i = 0; i < cover.data.length; i++) {
-            base64String += String.fromCharCode(cover.data[i]);
+          // find lyrics
+          //this.getLyrics(artist, title);
+
+          if (cover) {
+            // metaData to Image 
+            let base64String = "";
+            for (let i = 0; i < cover.data.length; i++) {
+              base64String += String.fromCharCode(cover.data[i]);
+            }
+
+            // base64 dataImage
+            cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
+
+            //read Color from dataImage
+            const coverImage = new Image();
+            coverImage.src = cover;
+            coverImage.onload = () => {
+              const colorThief = new ColorThief(),
+                colorArray = colorThief.getPalette(coverImage, 2);
+
+              this.setState({
+                colors: update(
+                  this.state.colors, {
+                    main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
+                    sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
+                  }
+                )
+              });
+            };
           }
 
-          // base64 dataImage
-          cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
-
-          //read Color from dataImage
-          const coverImage = new Image();
-          coverImage.src = cover;
-          coverImage.onload = () => {
-            const colorThief = new ColorThief(),
-              colorArray = colorThief.getPalette(coverImage, 2);
-
-            this.setState({
-              colors: update(
-                this.state.colors, {
-                  main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
-                  sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
-                }
-              )
-            });
-          };
+          this.setState({
+            audioData: update(
+              this.state.audioData, {
+                album: { $set: album },
+                title: { $set: title },
+                artist: { $set: artist },
+                cover: { $set: cover }
+              }
+            )
+          });
+        },
+        onError: (error) => {
+          Toast(':(' + error.info, 'alert');
         }
+      });
 
-        this.setState({
-          audioData: update(
-            this.state.audioData, {
-              album: { $set: album },
-              title: { $set: title },
-              artist: { $set: artist },
-              cover: { $set: cover }
-            }
-          )
-        });
-      },
-      onError: (error) => {
-        console.log(':(', error.type, error.info);
-      }
-    });
+      this.setState({ src: dataFile });
 
-    this.setState({ src: dataFile });
+    }
   }
   handleLyricsBtn() {
     this.setState({ showLyrics: !this.state.showLyrics });
@@ -260,7 +266,7 @@ class App extends Component {
         <Lyrics
           class={this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics'}
           color={this.state.colors.main}
-          data={this.state.lyricSet.lyrics}
+          data={this.state.lyrics}
           scroll={this.state.scroll}
           lyricsMounted={this.lyricsMounted}
           />
