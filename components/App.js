@@ -35,14 +35,10 @@ class App extends Component {
       colors: {
         main: 'black',
         sub: 'white'
-      },
-      lyricSet: {
-        time: 0,
-        lyrics: [],// all lyrics 
-        currentLyrics: []
-      },
+      },       
       showLyrics: false,
       findLyrics: false,
+      lyrics: [],
       scroll: 0.5,
     }
     this.handlePlay = this.handlePlay.bind(this);
@@ -222,13 +218,8 @@ class App extends Component {
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
       .then((response) => {
         let data = response.data;
-        this.setState({
-          lyricSet: update(
-            this.state.lyricSet, {
-              lyrics: { $set: data ? data.split('\n') : this.state.lyricSet.lyrics }
-            }
-          )
-        });
+        this.setState({ lyrics: data ? data.split('\n') : this.state.lyricSet.lyrics });
+
         data ? Toast('Lyrics Found!', 'success') : Toast('Lyrics Not Found!', 'default');
         if (data) this.setState({ showLyrics: true, findLyrics: false });
       }).catch((error) => { console.log(error); });
