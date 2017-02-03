@@ -42,7 +42,8 @@ class App extends Component {
         currentLyrics: []
       },
       showLyrics: false,
-      findLyrics: false
+      findLyrics: false,
+      scroll: 0.5,
     }
     this.handlePlay = this.handlePlay.bind(this);
     this.fileChange = this.fileChange.bind(this);
@@ -52,6 +53,8 @@ class App extends Component {
     this.colorReversal = this.colorReversal.bind(this);
     this.useMic = this.useMic.bind(this);
     this.openFindLyrics = this.openFindLyrics.bind(this);
+    this.lyricsMounted = this.lyricsMounted.bind(this);
+    this.wheelEvent = this.wheelEvent.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -183,6 +186,22 @@ class App extends Component {
       )
     });
   }
+  // when lyrics Component Mounted
+  lyricsMounted() {
+    const lyrics = document.querySelector('.lyrics');
+    lyrics.addEventListener('mousewheel', this.wheelEvent);
+    lyrics.addEventListener('DOMMouseScroll', this.wheelEvent);
+  }
+  wheelEvent(e) {
+    // e.deltaY > 0 ? Down : Up
+    let deltaY = e.deltaY > 0 ? -3 : 3;
+
+    if (this.state.scroll + deltaY <= -100 || this.state.scroll + deltaY >= 1) {
+      this.setState({ scroll: this.state.scroll });
+    } else {
+      this.setState({ scroll: this.state.scroll + deltaY });
+    }
+  }
   // show form
   openFindLyrics() {
     this.setState({ findLyrics: !this.state.findLyrics });
@@ -250,7 +269,10 @@ class App extends Component {
         <Lyrics
           class={this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics'}
           color={this.state.colors.main}
-          data={this.state.lyricSet.lyrics} />
+          data={this.state.lyricSet.lyrics}
+          scroll={this.state.scroll}
+          lyricsMounted={this.lyricsMounted}
+          />
         <NowPlaying data={this.state.audioData} />
       </div>
     );
