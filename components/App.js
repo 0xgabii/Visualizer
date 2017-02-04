@@ -108,16 +108,17 @@ class App extends Component {
   fileChange(e) {
     const files = e.target.files;
 
+    const arr = this.state.playlist;
+
     for (let i = 0; i < files.length; i++) {
       let file = files[i],
         dataFile = URL.createObjectURL(file);
 
-      // clean prevState
-      //this.setState(this.initialState);
+      const music = {};
 
       // read Audio metaData
       jsmediatags.read(file, {
-        onSuccess: (tag) => {
+        onSuccess: tag => {
           let tags = tag.tags,
             album = tags.album,
             title = tags.title,
@@ -144,34 +145,27 @@ class App extends Component {
               const colorThief = new ColorThief(),
                 colorArray = colorThief.getPalette(coverImage, 2);
 
-              this.setState({
-                colors: update(
-                  this.state.colors, {
-                    main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
-                    sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
-                  }
-                )
-              });
+              music.colors = {
+                main: 'rgb(' + colorArray[1].join(',') + ')',
+                sub: 'rgb(' + colorArray[0].join(',') + ')'
+              }
             };
           }
-
-          this.setState({
-            audioData: update(
-              this.state.audioData, {
-                src: { $set: dataFile },
-                album: { $set: album },
-                title: { $set: title },
-                artist: { $set: artist },
-                cover: { $set: cover }
-              }
-            )
-          });
+          music.audioData = {
+            src: dataFile,
+            album: album,
+            title: title,
+            artist: artist,
+            cover: cover
+          }
         },
-        onError: (error) => {
+        onError: error => {
           Toast(':(' + error.info, 'alert');
         }
       });
-    }
+      arr.push(music);
+    }// end for Loop  
+    this.setState({ playlist: arr });    
   }
   handleLyricsBtn() {
     this.setState({ showLyrics: !this.state.showLyrics });
@@ -222,7 +216,7 @@ class App extends Component {
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
       .then((response) => {
         let data = response.data;
-        this.setState({ lyrics: data ? data.split('\n') : this.state.lyricSet.lyrics });
+        this.setState({ lyrics: data ? data.split('\n') : this.state.lyrics });
 
         data ? Toast('Lyrics Found!', 'success') : Toast('Lyrics Not Found!', 'default');
         if (data) this.setState({ showLyrics: true, findLyrics: false });
@@ -256,8 +250,8 @@ class App extends Component {
         <Visualizer
           class={this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer'}
           color={this.state.colors.sub}
-          data={this.state.audioData}          
-          settings={this.state.visualizeSet}          
+          data={this.state.audioData}
+          settings={this.state.visualizeSet}
           isMounted={this.visualizing}
         />
         <Lyrics
