@@ -6,6 +6,7 @@ import Controller from './Controller';
 import Header from './Header';
 import NowPlaying from './NowPlaying';
 import Lyrics from './Lyrics';
+import playlist from './Playlist';
 //get audio file info
 import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
@@ -106,9 +107,8 @@ class App extends Component {
     }, (error) => { console.log(error); });
   }
   fileChange(e) {
-    const files = e.target.files;
-
-    const arr = this.state.playlist;
+    const files = e.target.files,
+      playlist = this.state.playlist;
 
     for (let i = 0; i < files.length; i++) {
       let file = files[i],
@@ -158,14 +158,20 @@ class App extends Component {
             artist: artist,
             cover: cover
           }
+
+          // push to array
+          playlist.push(music);
         },
         onError: error => {
           Toast(':(' + error.info, 'alert');
         }
       });
-      arr.push(music);
     }// end for Loop  
-    this.setState({ playlist: arr });    
+
+    if (files.length > 0) Toast(`${files.length} songs have been added to the playlist`, 'default');
+
+    // update playlist state;
+    this.setState({ playlist: playlist });
   }
   handleLyricsBtn() {
     this.setState({ showLyrics: !this.state.showLyrics });
