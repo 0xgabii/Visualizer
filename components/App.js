@@ -17,7 +17,6 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      src: '',
       // Set up the visualisation elements
       visualizeSet: {
         circle: 2 * Math.PI,
@@ -27,6 +26,7 @@ class App extends Component {
         data: []
       },
       audioData: {
+        src: '',
         album: '',
         title: '',
         cover: '',
@@ -108,7 +108,7 @@ class App extends Component {
   fileChange(e) {
     const files = e.target.files;
 
-    for (var i = 0; i < files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
       let file = files[i],
         dataFile = URL.createObjectURL(file);
 
@@ -158,6 +158,7 @@ class App extends Component {
           this.setState({
             audioData: update(
               this.state.audioData, {
+                src: { $set: dataFile },
                 album: { $set: album },
                 title: { $set: title },
                 artist: { $set: artist },
@@ -170,9 +171,6 @@ class App extends Component {
           Toast(':(' + error.info, 'alert');
         }
       });
-
-      this.setState({ src: dataFile });
-
     }
   }
   handleLyricsBtn() {
@@ -241,11 +239,10 @@ class App extends Component {
         <Header />
         <Controller
           color={this.state.colors.sub}
+          src={this.state.audioData.src}
 
-          src={this.state.src}
           handlePlay={this.handlePlay}
           fileChange={this.fileChange}
-
           handleSubmit={this.findLyrics}
 
           handleLyricsBtn={this.handleLyricsBtn}
@@ -255,21 +252,21 @@ class App extends Component {
 
           findLyrics={this.state.findLyrics}
           showLyrics={this.state.showLyrics}
-          />
+        />
         <Visualizer
           class={this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer'}
           color={this.state.colors.sub}
+          data={this.state.audioData}          
+          settings={this.state.visualizeSet}          
           isMounted={this.visualizing}
-          settings={this.state.visualizeSet}
-          data={this.state.audioData}
-          />
+        />
         <Lyrics
           class={this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics'}
           color={this.state.colors.main}
           data={this.state.lyrics}
           scroll={this.state.scroll}
           lyricsMounted={this.lyricsMounted}
-          />
+        />
         <NowPlaying data={this.state.audioData} />
       </div>
     );
