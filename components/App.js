@@ -305,6 +305,7 @@ class App extends Component {
         />
         <Playlist
           class={this.state.showPlaylist ? 'playlist show' : 'playlist'}
+          color={this.state.colors}
           playlist={this.state.playlist}
           handlePlaylistBtn={this.showPlaylist}
           audioData={this.state.audioData}

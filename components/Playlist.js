@@ -1,30 +1,43 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-const Playlist = (props) => {
-  return (
-    <div className={props.class} onClick={props.handlePlaylistBtn}>
-      <NowPlaying 
-        class="nowPlaying"
-        data={props.audioData} 
+class Playlist extends Component {
+  render() {
+    const style = {
+      backgroundColor : this.props.color.sub,
+      color :  this.props.color.main
+    }
+    return (
+      <div className={this.props.class} onClick={this.props.handlePlaylistBtn}>
+        <NowPlaying
+          class="nowPlaying"
+          data={this.props.audioData}
         />
-      {props.playlist.map((data, i) => {
-        return (
-          <Item
-            class="playlist__item"
-            album={data.audioData.album}
-            title={data.audioData.title}
-            artist={data.audioData.artist}
-            cover={data.audioData.cover}
-          />
-        )
-      })}
-    </div>
-  );
-};
+        <div className="playlist__item-wrapper">
+          {this.props.playlist.map((data, i) => {
+            const style = {
+              transitionDelay: i / 7 + 's'
+            }
+            return (
+              <Item
+                key={i}
+                class="playlist__item"
+                album={data.audioData.album}
+                title={data.audioData.title}
+                artist={data.audioData.artist}
+                cover={data.audioData.cover}
+                css={style}
+              />
+            )
+          })}
+        </div>
+      </div>
+    );
+  }
+}
 
 const Item = (props) => {
   return (
-    <div className={props.class}>
+    <div style={props.css} className={props.class}>
       <img className={props.class + '-cover'} src={props.cover} />
       <div className={props.class + '-infoBox'}>
         <span className={props.class + '-title'}>{props.title}</span>

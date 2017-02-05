@@ -53,10 +53,9 @@ body{
 	transition: all 0.3s 0.15s;
 }
 
-.btnGroup__controller > button:nth-of-type(1),
+.btnGroup__controller > button:nth-of-type(2),
 .btnGroup__controller > button:nth-of-type(3),
-.btnGroup__controller > button:nth-of-type(4),
-.btnGroup__controller > button:nth-of-type(5){
+.btnGroup__controller > button:nth-of-type(4){
 	border-right: none !important;
 }
 
@@ -162,26 +161,37 @@ body{
 	right: 0;
 	bottom: 0;
 	z-index: 2;
+	padding: 2rem;
 	width: 35rem;
-	height: 12rem;	
-	background-color: black;
-	color: white;
+	height: 14rem;	
 	transition: all 0.3s 0.15s;	
 }	
+.playlist:not(.show):hover{
+	background-color: rgba(0,0,0,0.16);
+}
 .playlist.show{
+	width: 45rem;
 	height: 100vh;	
+	background-color:black;
+	color: white;
+}
+
+.playlist__item-wrapper{
+	height: calc(100% - 15rem);
+	overflow-y:auto;	
+	overflow-x: hidden;
 }
 
 .playlist__item{
 	display: flex;
 	margin: 0.5rem 0;
-	opacity: 0.5;
-	transform: scale(0.5);
-	transition: all 0.5s 0.3s;	
+	opacity: 0;
+	transform: translateX(10rem);
+	transition: all 0.5s;				
 }
 .playlist.show .playlist__item{
 	opacity: 1;
-	transform: scale(1);
+	transform: translateX(0);
 }
 .playlist__item-cover{
 	width: 5rem;
@@ -214,10 +224,16 @@ body{
 }
 
 .nowPlaying-cover{
-	width: 12rem;
-	height: 12rem;
+	width: 10rem;
+	height: 10rem;
 	object-fit: cover;
 	object-position: center;
+	transition: all 0.3s 0.15s;
+}
+
+.playlist.show .nowPlaying-cover{
+	width: 15rem;
+	height: 15rem;
 }
 
 .nowPlaying-infoBox{
@@ -229,10 +245,10 @@ body{
 	min-width: 19rem;	
 }
 .nowPlaying-title{
-	font-size: 2.5rem;
+	font-size: 2.3rem;
 }
 .nowPlaying-artist{
-	font-size: 1.5rem;
+	font-size: 1.3rem;
 }
 .nowPlaying-album{
 	font-size: 1rem;
