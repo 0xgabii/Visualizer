@@ -29,6 +29,7 @@ const Item = (props) => {
         <span className={props.class + '-artist'}>{props.artist}</span>
         <span className={props.class + '-album'}>{props.album}</span>
       </div>
+      <span>Delete</span>
     </div>
   );
 };

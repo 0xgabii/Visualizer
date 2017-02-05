@@ -43,7 +43,7 @@ class Visualizer extends Component {
       const styles = {
         left: x,
         top: y,
-        height: 10 + newData[i] / 3,
+        height: 10 + newData[i] * 0.35,
         width: objWidth,
         backgroundColor: color,
         transform: 'rotate(' + rad + 'rad)'

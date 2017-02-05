@@ -17,7 +17,7 @@ class Controller extends Component {
       opacity: 0
     }
     const btn = {
-      border: '1px solid ' + this.props.color,
+      border: `1px solid ${this.props.color}`,
       color: this.props.color
     }
     return (
@@ -26,6 +26,7 @@ class Controller extends Component {
           onChange={this.props.fileChange}
           />
         <div className="btnGroup__controller">
+          <button style={btn} onClick={this.props.showPlaylist}>Playlist</button>
           <button style={btn} onClick={this.selectMusic}>Open file</button>
           <audio crossOrigin="anonymous" controls
             src={this.props.src}

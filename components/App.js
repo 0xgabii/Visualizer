@@ -21,7 +21,7 @@ class App extends Component {
       // Set up the visualisation elements
       visualizeSet: {
         circle: 2 * Math.PI,
-        radius: 225,
+        radius: 200,
         objWidth: 4,
         objCount: 150,
         data: []
@@ -29,7 +29,7 @@ class App extends Component {
       audioData: {
         src: '',
         album: '',
-        title: '',        
+        title: '',
         artist: '',
         cover: ''
       },
@@ -53,6 +53,8 @@ class App extends Component {
     this.openFindLyrics = this.openFindLyrics.bind(this);
     this.lyricsMounted = this.lyricsMounted.bind(this);
     this.wheelEvent = this.wheelEvent.bind(this);
+    this.changeState_colors = this.changeState_colors.bind(this);
+    this.changeState_audioData = this.changeState_audioData.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -114,6 +116,7 @@ class App extends Component {
       let file = files[i],
         dataFile = URL.createObjectURL(file);
 
+      // wrapping Ojbect
       const music = {};
 
       // read Audio metaData
@@ -131,26 +134,12 @@ class App extends Component {
           if (cover) {
             // metaData to Image 
             let base64String = "";
-            for (let i = 0; i < cover.data.length; i++) {
-              base64String += String.fromCharCode(cover.data[i]);
-            }
-
+            cover.data.forEach(data => { base64String += String.fromCharCode(data) });
             // base64 dataImage
             cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
-
-            //read Color from dataImage
-            const coverImage = new Image();
-            coverImage.src = cover;
-            coverImage.onload = () => {
-              const colorThief = new ColorThief(),
-                colorArray = colorThief.getPalette(coverImage, 2);
-
-              music.colors = {
-                main: 'rgb(' + colorArray[1].join(',') + ')',
-                sub: 'rgb(' + colorArray[0].join(',') + ')'
-              }
-            };
           }
+
+          //set ojbect audioData
           music.audioData = {
             src: dataFile,
             album: album,
@@ -158,22 +147,58 @@ class App extends Component {
             artist: artist,
             cover: cover
           }
-          
+
           // push to array
           playlist.push(music);
+
+          // when finished
+          if (i == files.length - 1) whenFinished();
         },
         onError: error => {
-          Toast(':(' + error.info, 'alert');
+          Toast('Failed to read file');
         }
       });
     }// end for Loop  
 
-    if (files.length > 0) Toast(`${files.length} songs have been added to the playlist`, 'default');
-
     // update playlist state;
-    this.setState({ playlist: playlist });
+    const whenFinished = () => {
+      if (files.length > 0) Toast(`${files.length} songs have been added to the playlist`, 'default');
 
-    console.log(files[0]);
+      this.setState({ playlist: playlist });
+      this.changeState_audioData(playlist[playlist.length - 1].audioData);
+      this.changeState_colors(this.state.audioData.cover);
+    }
+  }
+  //read Color from dataImage
+  changeState_colors(image) {
+    const coverImage = new Image();
+    coverImage.src = image;
+    coverImage.onload = () => {
+      const colorThief = new ColorThief(),
+        colorArray = colorThief.getPalette(coverImage, 2);
+
+      this.setState({
+        colors: update(
+          this.state.colors, {
+            main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
+            sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
+          }
+        )
+      });
+    };
+  }
+  changeState_audioData(obj) {
+    this.setState({
+      audioData: update(
+        this.state.audioData, {
+          src: { $set: obj.src },
+          album: { $set: obj.album },
+          title: { $set: obj.title },
+          artist: { $set: obj.artist },
+          cover: { $set: obj.cover },
+        }
+      )
+    });
   }
   handleLyricsBtn() {
     this.setState({ showLyrics: !this.state.showLyrics });
@@ -273,7 +298,7 @@ class App extends Component {
         <Playlist
           class="playlist"
           data={this.state.playlist}
-        />        
+        />
       </div>
     );
   }
