@@ -37,10 +37,11 @@ class App extends Component {
         main: 'black',
         sub: 'white'
       },
-      playlist: [],
       showLyrics: false,
       findLyrics: false,
       lyrics: [],
+      showPlaylist: false,
+      playlist: [],
       scroll: 0.5,
     }
     this.handlePlay = this.handlePlay.bind(this);
@@ -55,6 +56,7 @@ class App extends Component {
     this.wheelEvent = this.wheelEvent.bind(this);
     this.changeState_colors = this.changeState_colors.bind(this);
     this.changeState_audioData = this.changeState_audioData.bind(this);
+    this.showPlaylist = this.showPlaylist.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -112,6 +114,9 @@ class App extends Component {
     const files = e.target.files,
       playlist = this.state.playlist;
 
+    // clean prev state
+    if (files.length) this.setState(this.initialState);
+
     for (let i = 0; i < files.length; i++) {
       let file = files[i],
         dataFile = URL.createObjectURL(file);
@@ -155,7 +160,7 @@ class App extends Component {
           if (i == files.length - 1) whenFinished();
         },
         onError: error => {
-          Toast('Failed to read file');
+          Toast('Failed to read file', 'default');
         }
       });
     }// end for Loop  
@@ -169,11 +174,12 @@ class App extends Component {
       this.changeState_colors(this.state.audioData.cover);
     }
   }
-  //read Color from dataImage
+
   changeState_colors(image) {
     const coverImage = new Image();
     coverImage.src = image;
     coverImage.onload = () => {
+      //read Color from dataImage
       const colorThief = new ColorThief(),
         colorArray = colorThief.getPalette(coverImage, 2);
 
@@ -255,6 +261,9 @@ class App extends Component {
         if (data) this.setState({ showLyrics: true, findLyrics: false });
       }).catch((error) => { console.log(error); });
   }
+  showPlaylist() {
+    this.setState({ showPlaylist: !this.state.showPlaylist });
+  }
   render() {
     const styles = {
       color: this.state.colors.sub,
@@ -271,7 +280,7 @@ class App extends Component {
           handlePlay={this.handlePlay}
           fileChange={this.fileChange}
           handleSubmit={this.findLyrics}
-
+         
           handleLyricsBtn={this.handleLyricsBtn}
           handleFindLyricsBtn={this.openFindLyrics}
           handleReversalBtn={this.colorReversal}
@@ -294,10 +303,11 @@ class App extends Component {
           scroll={this.state.scroll}
           lyricsMounted={this.lyricsMounted}
         />
-        <NowPlaying data={this.state.audioData} />
         <Playlist
-          class="playlist"
-          data={this.state.playlist}
+          class={this.state.showPlaylist ? 'playlist show' : 'playlist'}
+          playlist={this.state.playlist}
+          handlePlaylistBtn={this.showPlaylist}
+          audioData={this.state.audioData}
         />
       </div>
     );

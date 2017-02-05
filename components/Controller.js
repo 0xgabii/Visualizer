@@ -26,7 +26,6 @@ class Controller extends Component {
           onChange={this.props.fileChange}
           />
         <div className="btnGroup__controller">
-          <button style={btn} onClick={this.props.showPlaylist}>Playlist</button>
           <button style={btn} onClick={this.selectMusic}>Open file</button>
           <audio crossOrigin="anonymous" controls
             src={this.props.src}

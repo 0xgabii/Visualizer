@@ -1,24 +1,26 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class Playlist extends Component {
-  render() {
-    return (
-      <div className={this.props.class}>
-        {this.props.data.map((data, i) => {
-          return (
-            <Item
-              class="playlist__item"
-              album={data.audioData.album}
-              title={data.audioData.title}
-              artist={data.audioData.artist}
-              cover={data.audioData.cover}
-            />
-          )
-        })}
-      </div>
-    );
-  }
-}
+const Playlist = (props) => {
+  return (
+    <div className={props.class} onClick={props.handlePlaylistBtn}>
+      <NowPlaying 
+        class="nowPlaying"
+        data={props.audioData} 
+        />
+      {props.playlist.map((data, i) => {
+        return (
+          <Item
+            class="playlist__item"
+            album={data.audioData.album}
+            title={data.audioData.title}
+            artist={data.audioData.artist}
+            cover={data.audioData.cover}
+          />
+        )
+      })}
+    </div>
+  );
+};
 
 const Item = (props) => {
   return (
@@ -29,7 +31,19 @@ const Item = (props) => {
         <span className={props.class + '-artist'}>{props.artist}</span>
         <span className={props.class + '-album'}>{props.album}</span>
       </div>
-      <span>Delete</span>
+    </div>
+  );
+};
+
+const NowPlaying = (props) => {
+  return (
+    <div className={props.class}>
+      <img className={props.class + '-cover'} src={props.data.cover} />
+      <div className={props.class + '-infoBox'}>
+        <span className={props.class + '-title'}>{props.data.title}</span>
+        <span className={props.class + '-artist'}>{props.data.artist}</span>
+        <span className={props.class + '-album'}>{props.data.album}</span>
+      </div>
     </div>
   );
 };
