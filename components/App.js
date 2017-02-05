@@ -63,6 +63,7 @@ class App extends Component {
 
     // initialState
     this.initialState = this.state;
+    this.initialColor = this.state.colors;
 
     // Init Settings
     this.audioContext = new AudioContext();
@@ -172,22 +173,26 @@ class App extends Component {
     }
   }
   changeState_colors(image) {
-    const coverImage = new Image();
-    coverImage.src = image;
-    coverImage.onload = () => {
-      //read Color from dataImage
-      const colorThief = new ColorThief(),
-        colorArray = colorThief.getPalette(coverImage, 2);
+    if (image) {
+      const coverImage = new Image();
+      coverImage.src = image;
+      coverImage.onload = () => {
+        //read Color from dataImage
+        const colorThief = new ColorThief(),
+          colorArray = colorThief.getPalette(coverImage, 2);
 
-      this.setState({
-        colors: update(
-          this.state.colors, {
-            main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
-            sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
-          }
-        )
-      });
-    };
+        this.setState({
+          colors: update(
+            this.state.colors, {
+              main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
+              sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
+            }
+          )
+        });
+      };
+    } else {
+      this.setState({ colors: this.initialColor });
+    }
   }
   changeState_audioData(obj) {
     this.setState({

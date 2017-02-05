@@ -5,7 +5,7 @@ class Playlist extends Component {
     super(props);
     this.handleClick = this.handleClick.bind(this);
   }
-  handleClick(e) {    
+  handleClick(e) {
     this.props.changeMusic(e.target.dataset.num);
   }
   render() {
@@ -65,7 +65,10 @@ const Item = (props) => {
 const NowPlaying = (props) => {
   return (
     <div className={props.class} onClick={props.onClick}>
-      <img className={props.class + '-cover'} src={props.data.cover} />
+      {props.data.cover ?
+        <img className={props.class + '-cover'} src={props.data.cover} />
+        : ''
+      }
       <div className={props.class + '-infoBox'}>
         <span className={props.class + '-title'}>{props.data.title}</span>
         <span className={props.class + '-artist'}>{props.data.artist}</span>

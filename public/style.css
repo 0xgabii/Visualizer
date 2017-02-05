@@ -195,8 +195,6 @@ body{
 }
 
 .playlist__item-wrapper{
-	display: flex;
-	flex-direction: column;
 	margin-top: 1rem;
 	height: calc(100% - 15rem);
 	overflow-y:auto;	
@@ -205,7 +203,7 @@ body{
 
 .playlist__item{
 	display: flex;
-	margin: 0.65rem 0;
+	margin: 0.8rem 0;
 	opacity: 0;
 	transform: translateX(10rem);
 	transition: opacity 0.5s,
