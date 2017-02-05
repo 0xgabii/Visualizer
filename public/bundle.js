@@ -21623,6 +21623,7 @@
 
 	    // initialState
 	    _this.initialState = _this.state;
+	    _this.initialColor = _this.state.colors;
 
 	    // Init Settings
 	    _this.audioContext = new AudioContext();
@@ -21756,20 +21757,26 @@
 	    value: function changeState_colors(image) {
 	      var _this4 = this;
 
-	      var coverImage = new Image();
-	      coverImage.src = image;
-	      coverImage.onload = function () {
-	        //read Color from dataImage
-	        var colorThief = new _colorThiefStandalone2.default(),
-	            colorArray = colorThief.getPalette(coverImage, 2);
+	      if (image) {
+	        (function () {
+	          var coverImage = new Image();
+	          coverImage.src = image;
+	          coverImage.onload = function () {
+	            //read Color from dataImage
+	            var colorThief = new _colorThiefStandalone2.default(),
+	                colorArray = colorThief.getPalette(coverImage, 2);
 
-	        _this4.setState({
-	          colors: (0, _reactAddonsUpdate2.default)(_this4.state.colors, {
-	            main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
-	            sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
-	          })
-	        });
-	      };
+	            _this4.setState({
+	              colors: (0, _reactAddonsUpdate2.default)(_this4.state.colors, {
+	                main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
+	                sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
+	              })
+	            });
+	          };
+	        })();
+	      } else {
+	        this.setState({ colors: this.initialColor });
+	      }
 	    }
 	  }, {
 	    key: 'changeState_audioData',
@@ -24055,7 +24062,7 @@
 	  return _react2.default.createElement(
 	    "div",
 	    { className: props.class, onClick: props.onClick },
-	    _react2.default.createElement("img", { className: props.class + '-cover', src: props.data.cover }),
+	    props.data.cover ? _react2.default.createElement("img", { className: props.class + '-cover', src: props.data.cover }) : '',
 	    _react2.default.createElement(
 	      "div",
 	      { className: props.class + '-infoBox' },
