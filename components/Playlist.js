@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
 
 class Playlist extends Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleClick(e) {    
+    this.props.changeMusic(e.target.dataset.num);
+  }
   render() {
     const style = {
-      backgroundColor : this.props.color.sub,
-      color :  this.props.color.main
+      backgroundColor: this.props.color.sub,
+      color: this.props.color.main
     }
     return (
-      <div className={this.props.class} onClick={this.props.handlePlaylistBtn}>
-        <NowPlaying
+      <div className={this.props.class}>
+        <div className="backdrop" onClick={this.props.handlePlaylistBtn}></div>
+        <NowPlaying onClick={this.props.handlePlaylistBtn}
           class="nowPlaying"
           data={this.props.audioData}
         />
@@ -20,12 +28,14 @@ class Playlist extends Component {
             return (
               <Item
                 key={i}
+                num={i}
                 class="playlist__item"
                 album={data.audioData.album}
                 title={data.audioData.title}
                 artist={data.audioData.artist}
                 cover={data.audioData.cover}
                 css={style}
+                onClick={this.handleClick}
               />
             )
           })}
@@ -37,7 +47,11 @@ class Playlist extends Component {
 
 const Item = (props) => {
   return (
-    <div style={props.css} className={props.class}>
+    <div
+      onClick={props.onClick}
+      style={props.css}
+      className={props.class}
+      data-num={props.num} >
       <img className={props.class + '-cover'} src={props.cover} />
       <div className={props.class + '-infoBox'}>
         <span className={props.class + '-title'}>{props.title}</span>
@@ -50,7 +64,7 @@ const Item = (props) => {
 
 const NowPlaying = (props) => {
   return (
-    <div className={props.class}>
+    <div className={props.class} onClick={props.onClick}>
       <img className={props.class + '-cover'} src={props.data.cover} />
       <div className={props.class + '-infoBox'}>
         <span className={props.class + '-title'}>{props.data.title}</span>

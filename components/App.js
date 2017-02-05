@@ -57,6 +57,7 @@ class App extends Component {
     this.changeState_colors = this.changeState_colors.bind(this);
     this.changeState_audioData = this.changeState_audioData.bind(this);
     this.showPlaylist = this.showPlaylist.bind(this);
+    this.changeMusic = this.changeMusic.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -114,9 +115,6 @@ class App extends Component {
     const files = e.target.files,
       playlist = this.state.playlist;
 
-    // clean prev state
-    if (files.length) this.setState(this.initialState);
-
     for (let i = 0; i < files.length; i++) {
       let file = files[i],
         dataFile = URL.createObjectURL(file);
@@ -132,9 +130,6 @@ class App extends Component {
             title = tags.title,
             artist = tags.artist,
             cover = tags.picture;
-
-          // find lyrics
-          //this.getLyrics(artist, title);
 
           if (cover) {
             // metaData to Image 
@@ -170,11 +165,10 @@ class App extends Component {
       if (files.length > 0) Toast(`${files.length} songs have been added to the playlist`, 'default');
 
       this.setState({ playlist: playlist });
-      this.changeState_audioData(playlist[playlist.length - 1].audioData);
-      this.changeState_colors(this.state.audioData.cover);
+
+      if (!this.state.audioData.src) this.changeState_audioData(playlist[playlist.length - 1].audioData);
     }
   }
-
   changeState_colors(image) {
     const coverImage = new Image();
     coverImage.src = image;
@@ -204,6 +198,12 @@ class App extends Component {
           cover: { $set: obj.cover },
         }
       )
+    }, () => {
+      this.setState({ lyrics: [], scroll: 0.5 });
+      // find lyrics
+      this.getLyrics(this.state.audioData.artist, this.state.audioData.title);
+      // change Colors      
+      this.changeState_colors(this.state.audioData.cover);
     });
   }
   handleLyricsBtn() {
@@ -264,6 +264,9 @@ class App extends Component {
   showPlaylist() {
     this.setState({ showPlaylist: !this.state.showPlaylist });
   }
+  changeMusic(num) {
+    this.changeState_audioData(this.state.playlist[num].audioData);
+  }
   render() {
     const styles = {
       color: this.state.colors.sub,
@@ -280,7 +283,7 @@ class App extends Component {
           handlePlay={this.handlePlay}
           fileChange={this.fileChange}
           handleSubmit={this.findLyrics}
-         
+
           handleLyricsBtn={this.handleLyricsBtn}
           handleFindLyricsBtn={this.openFindLyrics}
           handleReversalBtn={this.colorReversal}
@@ -307,6 +310,7 @@ class App extends Component {
           class={this.state.showPlaylist ? 'playlist show' : 'playlist'}
           color={this.state.colors}
           playlist={this.state.playlist}
+          changeMusic={this.changeMusic}
           handlePlaylistBtn={this.showPlaylist}
           audioData={this.state.audioData}
         />

@@ -27,7 +27,7 @@ class Controller extends Component {
           />
         <div className="btnGroup__controller">
           <button style={btn} onClick={this.selectMusic}>Open file</button>
-          <audio crossOrigin="anonymous" controls
+          <audio crossOrigin="anonymous" controls autoPlay
             src={this.props.src}
             onLoadedData={this.props.handlePlay}     
             ></audio>

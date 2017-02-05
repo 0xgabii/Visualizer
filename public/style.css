@@ -34,7 +34,7 @@ body{
 	display: flex;	
 	position: absolute;
 	top: 5%;
-	z-index: 3;
+	z-index: 2;
 	width: 100%;
 	flex-direction: column;
  	align-items: center;
@@ -162,21 +162,40 @@ body{
 	bottom: 0;
 	z-index: 2;
 	padding: 2rem;
-	width: 35rem;
-	height: 14rem;	
+	width: 38rem;
+	height: 11rem;		
 	transition: all 0.3s 0.15s;	
 }	
 .playlist:not(.show):hover{
+	cursor: pointer;
 	background-color: rgba(0,0,0,0.16);
+	box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
 }
 .playlist.show{
 	width: 45rem;
 	height: 100vh;	
-	background-color:black;
+	background-color:rgba(0, 0, 0, 0.73);	
 	color: white;
+	box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);	
+}
+
+.playlist.show .backdrop{
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	opacity: 0;
+	background-color: rgba(0,0,0,0.5);
+	transition: all 0.3s;
+}
+
+.playlist.show .backdrop{
+	opacity: 1;
 }
 
 .playlist__item-wrapper{
+	margin-top: 1rem;
 	height: calc(100% - 15rem);
 	overflow-y:auto;	
 	overflow-x: hidden;
@@ -184,10 +203,16 @@ body{
 
 .playlist__item{
 	display: flex;
-	margin: 0.5rem 0;
+	margin: 0.65rem 0;
 	opacity: 0;
 	transform: translateX(10rem);
 	transition: all 0.5s;				
+}
+.playlist__item:hover{
+	background-color: rgba(255,255,255,0.15);
+}
+.playlist__item *{
+	pointer-events: none;
 }
 .playlist.show .playlist__item{
 	opacity: 1;
@@ -224,8 +249,8 @@ body{
 }
 
 .nowPlaying-cover{
-	width: 10rem;
-	height: 10rem;
+	width: 7rem;
+	height: 7rem;
 	object-fit: cover;
 	object-position: center;
 	transition: all 0.3s 0.15s;
@@ -244,8 +269,11 @@ body{
 	font-weight: 300;
 	min-width: 19rem;	
 }
+.nowPlaying-infoBox > span{
+	transition: all 0.3s;
+}
 .nowPlaying-title{
-	font-size: 2.3rem;
+	font-size: 2.1rem;
 }
 .nowPlaying-artist{
 	font-size: 1.3rem;
@@ -254,6 +282,15 @@ body{
 	font-size: 1rem;
 }
 
+.playlist.show .nowPlaying-title{
+	font-size: 2.5rem;
+}
+.playlist.show .nowPlaying-artist{
+	font-size: 1.7rem;
+}
+.playlist.show .nowPlaying-album{
+	font-size: 1.3rem;
+}
 
 .toast {
 	position: fixed;
