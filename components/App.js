@@ -42,6 +42,7 @@ class App extends Component {
       lyrics: [],
       showPlaylist: false,
       playlist: [],
+      currentPlay: 0,// current music in playlist idx 
       scroll: 0.5,
     }
     this.handlePlay = this.handlePlay.bind(this);
@@ -58,6 +59,7 @@ class App extends Component {
     this.changeState_audioData = this.changeState_audioData.bind(this);
     this.showPlaylist = this.showPlaylist.bind(this);
     this.changeMusic = this.changeMusic.bind(this);
+    this.musicEnded = this.musicEnded.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -166,7 +168,7 @@ class App extends Component {
 
       this.setState({ playlist: playlist });
 
-      if (!this.state.audioData.src) this.changeState_audioData(playlist[playlist.length - 1].audioData);
+      if (!this.state.audioData.src) this.changeState_audioData(playlist[this.state.currentPlay].audioData);
     }
   }
   changeState_colors(image) {
@@ -199,7 +201,7 @@ class App extends Component {
         }
       )
     }, () => {
-      this.setState({ lyrics: [], scroll: 0.5 });
+      this.setState({ lyrics: [], showLyrics: false, scroll: 0.5 });
       // find lyrics
       this.getLyrics(this.state.audioData.artist, this.state.audioData.title);
       // change Colors      
@@ -265,7 +267,22 @@ class App extends Component {
     this.setState({ showPlaylist: !this.state.showPlaylist });
   }
   changeMusic(num) {
+    if (num >= this.state.playlist.length)
+      num = 0;
+    else if (num < 0)
+      num = this.state.playlist.length - 1;
+
     this.changeState_audioData(this.state.playlist[num].audioData);
+    this.setState({ currentPlay: num });
+
+    console.log(this.state.currentPlay);
+  }
+  musicEnded() {
+    let musicIdx = this.state.currentPlay,
+      playlistLenght = this.state.playlist.length;
+
+    // When there is more than one song
+    if (playlistLenght > 1) this.changeMusic(musicIdx + 1)
   }
   render() {
     const styles = {
@@ -288,6 +305,8 @@ class App extends Component {
           handleFindLyricsBtn={this.openFindLyrics}
           handleReversalBtn={this.colorReversal}
           handleMicBtn={this.useMic}
+
+          musicEnded={this.musicEnded}
 
           findLyrics={this.state.findLyrics}
           showLyrics={this.state.showLyrics}

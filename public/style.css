@@ -186,7 +186,7 @@ body{
 	width: 100vw;
 	height: 100vh;
 	opacity: 0;
-	background-color: rgba(0,0,0,0.5);
+	background-color: rgba(0,0,0,0.6);
 	transition: all 0.3s;
 }
 
@@ -195,6 +195,8 @@ body{
 }
 
 .playlist__item-wrapper{
+	display: flex;
+	flex-direction: column;
 	margin-top: 1rem;
 	height: calc(100% - 15rem);
 	overflow-y:auto;	
@@ -206,11 +208,24 @@ body{
 	margin: 0.65rem 0;
 	opacity: 0;
 	transform: translateX(10rem);
-	transition: all 0.5s;				
+	transition: opacity 0.5s,
+				transform 0.5s;				
 }
 .playlist__item:hover{
-	background-color: rgba(255,255,255,0.15);
+	animation: bg 2s;	
 }
+@keyframes bg{
+	0%{
+		background-color:transparent;
+	}
+	50%{
+		background-color:rgba(255, 255,255, 0.06);	
+	}
+	100%{
+		background-color:transparent;
+	}
+}
+
 .playlist__item *{
 	pointer-events: none;
 }

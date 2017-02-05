@@ -29,6 +29,7 @@ class Controller extends Component {
           <button style={btn} onClick={this.selectMusic}>Open file</button>
           <audio crossOrigin="anonymous" controls autoPlay
             src={this.props.src}
+            onEnded={this.props.musicEnded}
             onLoadedData={this.props.handlePlay}     
             ></audio>
           <button style={btn} onClick={this.props.handleLyricsBtn}>{this.props.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'}</button>
