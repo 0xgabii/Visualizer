@@ -173,6 +173,37 @@ body{
 	margin: 1rem 0;
 	line-height: 1.75;
 }
+
+.playlist__item{
+	display: flex;
+	margin: 1rem 0;
+}
+
+.playlist__item-cover{
+	width: 5rem;
+	height: 5rem;
+	object-fit: cover;
+	object-position: center;
+}
+
+.playlist__item-infoBox{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	margin-left: 1rem;
+	font-weight: 300;
+}
+.playlist__item-title{
+	font-size: 1.5rem;
+}
+.playlist__item-artist{
+	font-size: 1rem;
+}
+.playlist__item-album{
+	font-size: 1rem;
+}
+
+
 .toast {
 	position: fixed;
 	top: -100px;

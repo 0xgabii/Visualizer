@@ -6,7 +6,7 @@ import Controller from './Controller';
 import Header from './Header';
 import NowPlaying from './NowPlaying';
 import Lyrics from './Lyrics';
-import playlist from './Playlist';
+import Playlist from './Playlist';
 //get audio file info
 import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
@@ -29,9 +29,9 @@ class App extends Component {
       audioData: {
         src: '',
         album: '',
-        title: '',
-        cover: '',
-        artist: ''
+        title: '',        
+        artist: '',
+        cover: ''
       },
       colors: {
         main: 'black',
@@ -158,7 +158,7 @@ class App extends Component {
             artist: artist,
             cover: cover
           }
-
+          
           // push to array
           playlist.push(music);
         },
@@ -172,6 +172,8 @@ class App extends Component {
 
     // update playlist state;
     this.setState({ playlist: playlist });
+
+    console.log(files[0]);
   }
   handleLyricsBtn() {
     this.setState({ showLyrics: !this.state.showLyrics });
@@ -268,6 +270,10 @@ class App extends Component {
           lyricsMounted={this.lyricsMounted}
         />
         <NowPlaying data={this.state.audioData} />
+        <Playlist
+          class="playlist"
+          data={this.state.playlist}
+        />        
       </div>
     );
   }
