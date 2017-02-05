@@ -1,13 +1,13 @@
 # Visualizer
 
-![v1.3](images/v1.4.png)
+![v1.45](images/v1.45.png)
 
-##Current Version - 1.4
+##Current Version - 1.45
 (Development) - [https://gomonk3037.github.io/Visualizer/](https://gomonk3037.github.io/Visualizer/)
 
 ## About
 
-Music Visualizer  + Auto Find lyrics
+Music Visualizer  + Auto Find lyrics + Playlist
 
 Made Width **React**
 

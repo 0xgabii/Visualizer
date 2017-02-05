@@ -21541,15 +21541,19 @@
 
 	var _Lyrics2 = _interopRequireDefault(_Lyrics);
 
-	var _jsmediatags = __webpack_require__(211);
+	var _Playlist = __webpack_require__(211);
+
+	var _Playlist2 = _interopRequireDefault(_Playlist);
+
+	var _jsmediatags = __webpack_require__(212);
 
 	var _jsmediatags2 = _interopRequireDefault(_jsmediatags);
 
-	var _colorThiefStandalone = __webpack_require__(230);
+	var _colorThiefStandalone = __webpack_require__(231);
 
 	var _colorThiefStandalone2 = _interopRequireDefault(_colorThiefStandalone);
 
-	var _Toast = __webpack_require__(231);
+	var _Toast = __webpack_require__(232);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21574,32 +21578,32 @@
 	    var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
 	    _this.state = {
-	      src: '',
 	      // Set up the visualisation elements
 	      visualizeSet: {
 	        circle: 2 * Math.PI,
-	        radius: 225,
+	        radius: 200,
 	        objWidth: 4,
 	        objCount: 150,
 	        data: []
 	      },
 	      audioData: {
+	        src: '',
 	        album: '',
 	        title: '',
-	        cover: '',
-	        artist: ''
+	        artist: '',
+	        cover: ''
 	      },
 	      colors: {
 	        main: 'black',
 	        sub: 'white'
 	      },
-	      lyricSet: {
-	        time: 0,
-	        lyrics: [], // all lyrics 
-	        currentLyrics: []
-	      },
 	      showLyrics: false,
-	      findLyrics: false
+	      findLyrics: false,
+	      lyrics: [],
+	      showPlaylist: false,
+	      playlist: [],
+	      currentPlay: 0, // current music in playlist idx 
+	      scroll: 0.5
 	    };
 	    _this.handlePlay = _this.handlePlay.bind(_this);
 	    _this.fileChange = _this.fileChange.bind(_this);
@@ -21609,6 +21613,13 @@
 	    _this.colorReversal = _this.colorReversal.bind(_this);
 	    _this.useMic = _this.useMic.bind(_this);
 	    _this.openFindLyrics = _this.openFindLyrics.bind(_this);
+	    _this.lyricsMounted = _this.lyricsMounted.bind(_this);
+	    _this.wheelEvent = _this.wheelEvent.bind(_this);
+	    _this.changeState_colors = _this.changeState_colors.bind(_this);
+	    _this.changeState_audioData = _this.changeState_audioData.bind(_this);
+	    _this.showPlaylist = _this.showPlaylist.bind(_this);
+	    _this.changeMusic = _this.changeMusic.bind(_this);
+	    _this.musicEnded = _this.musicEnded.bind(_this);
 
 	    // initialState
 	    _this.initialState = _this.state;
@@ -21677,67 +21688,109 @@
 	    value: function fileChange(e) {
 	      var _this3 = this;
 
-	      var file = e.target.files[0],
-	          dataFile = URL.createObjectURL(file);
+	      var files = e.target.files,
+	          playlist = this.state.playlist;
 
-	      // clean prevState
-	      this.setState(this.initialState);
+	      var _loop = function _loop(i) {
+	        var file = files[i],
+	            dataFile = URL.createObjectURL(file);
 
-	      // read Audio metaData
-	      _jsmediatags2.default.read(file, {
-	        onSuccess: function onSuccess(tag) {
-	          var tags = tag.tags,
-	              album = tags.album,
-	              title = tags.title,
-	              artist = tags.artist,
-	              cover = tags.picture;
+	        // wrapping Ojbect
+	        var music = {};
 
-	          // find lyrics
-	          _this3.getLyrics(artist, title);
+	        // read Audio metaData
+	        _jsmediatags2.default.read(file, {
+	          onSuccess: function onSuccess(tag) {
+	            var tags = tag.tags,
+	                album = tags.album,
+	                title = tags.title,
+	                artist = tags.artist,
+	                cover = tags.picture;
 
-	          if (cover) {
-	            (function () {
+	            if (cover) {
 	              // metaData to Image 
 	              var base64String = "";
-	              for (var i = 0; i < cover.data.length; i++) {
-	                base64String += String.fromCharCode(cover.data[i]);
-	              }
-
+	              cover.data.forEach(function (data) {
+	                base64String += String.fromCharCode(data);
+	              });
 	              // base64 dataImage
 	              cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
+	            }
 
-	              //read Color from dataImage
-	              var coverImage = new Image();
-	              coverImage.src = cover;
-	              coverImage.onload = function () {
-	                var colorThief = new _colorThiefStandalone2.default(),
-	                    colorArray = colorThief.getPalette(coverImage, 2);
+	            //set ojbect audioData
+	            music.audioData = {
+	              src: dataFile,
+	              album: album,
+	              title: title,
+	              artist: artist,
+	              cover: cover
+	            };
 
-	                _this3.setState({
-	                  colors: (0, _reactAddonsUpdate2.default)(_this3.state.colors, {
-	                    main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
-	                    sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
-	                  })
-	                });
-	              };
-	            })();
+	            // push to array
+	            playlist.push(music);
+
+	            // when finished
+	            if (i == files.length - 1) whenFinished();
+	          },
+	          onError: function onError(error) {
+	            (0, _Toast.Toast)('Failed to read file', 'default');
 	          }
+	        });
+	      };
 
-	          _this3.setState({
-	            audioData: (0, _reactAddonsUpdate2.default)(_this3.state.audioData, {
-	              album: { $set: album },
-	              title: { $set: title },
-	              artist: { $set: artist },
-	              cover: { $set: cover }
-	            })
-	          });
-	        },
-	        onError: function onError(error) {
-	          console.log(':(', error.type, error.info);
-	        }
+	      for (var i = 0; i < files.length; i++) {
+	        _loop(i);
+	      } // end for Loop  
+
+	      // update playlist state;
+	      var whenFinished = function whenFinished() {
+	        if (files.length > 0) (0, _Toast.Toast)(files.length + ' songs have been added to the playlist', 'default');
+
+	        _this3.setState({ playlist: playlist });
+
+	        if (!_this3.state.audioData.src) _this3.changeState_audioData(playlist[_this3.state.currentPlay].audioData);
+	      };
+	    }
+	  }, {
+	    key: 'changeState_colors',
+	    value: function changeState_colors(image) {
+	      var _this4 = this;
+
+	      var coverImage = new Image();
+	      coverImage.src = image;
+	      coverImage.onload = function () {
+	        //read Color from dataImage
+	        var colorThief = new _colorThiefStandalone2.default(),
+	            colorArray = colorThief.getPalette(coverImage, 2);
+
+	        _this4.setState({
+	          colors: (0, _reactAddonsUpdate2.default)(_this4.state.colors, {
+	            main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
+	            sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
+	          })
+	        });
+	      };
+	    }
+	  }, {
+	    key: 'changeState_audioData',
+	    value: function changeState_audioData(obj) {
+	      var _this5 = this;
+
+	      this.setState({
+	        audioData: (0, _reactAddonsUpdate2.default)(this.state.audioData, {
+	          src: { $set: obj.src },
+	          album: { $set: obj.album },
+	          title: { $set: obj.title },
+	          artist: { $set: obj.artist },
+	          cover: { $set: obj.cover }
+	        })
+	      }, function () {
+	        _this5.setState({ lyrics: [], showLyrics: false, scroll: 0.5 });
+	        // find lyrics
+	        _this5.getLyrics(_this5.state.audioData.artist, _this5.state.audioData.title);
+	        // change Colors      
+	        _this5.changeState_colors(_this5.state.audioData.cover);
 	      });
-
-	      this.setState({ src: dataFile });
 	    }
 	  }, {
 	    key: 'handleLyricsBtn',
@@ -21753,6 +21806,27 @@
 	          sub: { $set: this.state.colors.main }
 	        })
 	      });
+	    }
+	    // when lyrics Component Mounted
+
+	  }, {
+	    key: 'lyricsMounted',
+	    value: function lyricsMounted() {
+	      var lyrics = document.querySelector('.lyrics');
+	      lyrics.addEventListener('mousewheel', this.wheelEvent);
+	      lyrics.addEventListener('DOMMouseScroll', this.wheelEvent);
+	    }
+	  }, {
+	    key: 'wheelEvent',
+	    value: function wheelEvent(e) {
+	      // e.deltaY > 0 ? Down : Up
+	      var deltaY = e.deltaY > 0 ? -3 : 3;
+
+	      if (this.state.scroll + deltaY <= -100 || this.state.scroll + deltaY >= 1) {
+	        this.setState({ scroll: this.state.scroll });
+	      } else {
+	        this.setState({ scroll: this.state.scroll + deltaY });
+	      }
 	    }
 	    // show form
 
@@ -21778,22 +21852,43 @@
 	  }, {
 	    key: 'getLyrics',
 	    value: function getLyrics(artist, title) {
-	      var _this4 = this;
+	      var _this6 = this;
 
 	      // alert
 	      if (!this.state.showLyrics) (0, _Toast.Toast)('Only lyrics in English can be searched', 'default');
 	      _axios2.default.get('https://young-savannah-79010.herokuapp.com/lyrics/' + artist + '/' + title).then(function (response) {
 	        var data = response.data;
-	        _this4.setState({
-	          lyricSet: (0, _reactAddonsUpdate2.default)(_this4.state.lyricSet, {
-	            lyrics: { $set: data ? data.split('\n') : _this4.state.lyricSet.lyrics }
-	          })
-	        });
+	        _this6.setState({ lyrics: data ? data.split('\n') : _this6.state.lyrics });
+
 	        data ? (0, _Toast.Toast)('Lyrics Found!', 'success') : (0, _Toast.Toast)('Lyrics Not Found!', 'default');
-	        if (data) _this4.setState({ showLyrics: true, findLyrics: false });
+	        if (data) _this6.setState({ showLyrics: true, findLyrics: false });
 	      }).catch(function (error) {
 	        console.log(error);
 	      });
+	    }
+	  }, {
+	    key: 'showPlaylist',
+	    value: function showPlaylist() {
+	      this.setState({ showPlaylist: !this.state.showPlaylist });
+	    }
+	  }, {
+	    key: 'changeMusic',
+	    value: function changeMusic(num) {
+	      if (num >= this.state.playlist.length) num = 0;else if (num < 0) num = this.state.playlist.length - 1;
+
+	      this.changeState_audioData(this.state.playlist[num].audioData);
+	      this.setState({ currentPlay: num });
+
+	      console.log(this.state.currentPlay);
+	    }
+	  }, {
+	    key: 'musicEnded',
+	    value: function musicEnded() {
+	      var musicIdx = this.state.currentPlay,
+	          playlistLenght = this.state.playlist.length;
+
+	      // When there is more than one song
+	      if (playlistLenght > 1) this.changeMusic(musicIdx + 1);
 	    }
 	  }, {
 	    key: 'render',
@@ -21809,11 +21904,10 @@
 	        _react2.default.createElement(_Header2.default, null),
 	        _react2.default.createElement(_Controller2.default, {
 	          color: this.state.colors.sub,
+	          src: this.state.audioData.src,
 
-	          src: this.state.src,
 	          handlePlay: this.handlePlay,
 	          fileChange: this.fileChange,
-
 	          handleSubmit: this.findLyrics,
 
 	          handleLyricsBtn: this.handleLyricsBtn,
@@ -21821,21 +21915,33 @@
 	          handleReversalBtn: this.colorReversal,
 	          handleMicBtn: this.useMic,
 
+	          musicEnded: this.musicEnded,
+
 	          findLyrics: this.state.findLyrics,
 	          showLyrics: this.state.showLyrics
 	        }),
 	        _react2.default.createElement(_Visualizer2.default, {
 	          'class': this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer',
 	          color: this.state.colors.sub,
-	          isMounted: this.visualizing,
+	          data: this.state.audioData,
 	          settings: this.state.visualizeSet,
-	          data: this.state.audioData
+	          isMounted: this.visualizing
 	        }),
 	        _react2.default.createElement(_Lyrics2.default, {
 	          'class': this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics',
 	          color: this.state.colors.main,
-	          data: this.state.lyricSet.lyrics }),
-	        _react2.default.createElement(_NowPlaying2.default, { data: this.state.audioData })
+	          data: this.state.lyrics,
+	          scroll: this.state.scroll,
+	          lyricsMounted: this.lyricsMounted
+	        }),
+	        _react2.default.createElement(_Playlist2.default, {
+	          'class': this.state.showPlaylist ? 'playlist show' : 'playlist',
+	          color: this.state.colors,
+	          playlist: this.state.playlist,
+	          changeMusic: this.changeMusic,
+	          handlePlaylistBtn: this.showPlaylist,
+	          audioData: this.state.audioData
+	        })
 	      );
 	    }
 	  }]);
@@ -23537,7 +23643,7 @@
 	        var styles = {
 	          left: x,
 	          top: y,
-	          height: 10 + newData[i] / 3,
+	          height: 10 + newData[i] * 0.35,
 	          width: objWidth,
 	          backgroundColor: color,
 	          transform: 'rotate(' + rad + 'rad)'
@@ -23619,7 +23725,7 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'music-controller' },
-	        _react2.default.createElement('input', { style: invisible, id: 'audioFile', type: 'file', accept: 'audio/*',
+	        _react2.default.createElement('input', { style: invisible, id: 'audioFile', type: 'file', accept: 'audio/*', multiple: true,
 	          onChange: this.props.fileChange
 	        }),
 	        _react2.default.createElement(
@@ -23630,8 +23736,9 @@
 	            { style: btn, onClick: this.selectMusic },
 	            'Open file'
 	          ),
-	          _react2.default.createElement('audio', { crossOrigin: 'anonymous', controls: true,
+	          _react2.default.createElement('audio', { crossOrigin: 'anonymous', controls: true, autoPlay: true,
 	            src: this.props.src,
+	            onEnded: this.props.musicEnded,
 	            onLoadedData: this.props.handlePlay
 	          }),
 	          _react2.default.createElement(
@@ -23777,36 +23884,16 @@
 	var Lyrics = function (_Component) {
 	    _inherits(Lyrics, _Component);
 
-	    function Lyrics(props) {
+	    function Lyrics() {
 	        _classCallCheck(this, Lyrics);
 
-	        var _this = _possibleConstructorReturn(this, (Lyrics.__proto__ || Object.getPrototypeOf(Lyrics)).call(this, props));
-
-	        _this.state = {
-	            scroll: 0.5
-	        };
-	        _this.wheelEvent = _this.wheelEvent.bind(_this);
-	        return _this;
+	        return _possibleConstructorReturn(this, (Lyrics.__proto__ || Object.getPrototypeOf(Lyrics)).apply(this, arguments));
 	    }
 
 	    _createClass(Lyrics, [{
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
-	            var lyrics = document.querySelector('.lyrics');
-	            lyrics.addEventListener('mousewheel', this.wheelEvent);
-	            lyrics.addEventListener('DOMMouseScroll', this.wheelEvent);
-	        }
-	    }, {
-	        key: 'wheelEvent',
-	        value: function wheelEvent(e) {
-	            // e.deltaY > 0 ? Down : Up
-	            var deltaY = e.deltaY > 0 ? -3 : 3;
-
-	            if (this.state.scroll + deltaY <= -100 || this.state.scroll + deltaY >= 1) {
-	                this.setState({ scroll: this.state.scroll });
-	            } else {
-	                this.setState({ scroll: this.state.scroll + deltaY });
-	            }
+	            this.props.lyricsMounted();
 	        }
 	    }, {
 	        key: 'shouldComponentUpdate',
@@ -23822,7 +23909,7 @@
 	                background: this.props.color
 	            },
 	                scroll = {
-	                transform: 'translateY(' + this.state.scroll + '%)'
+	                transform: 'translateY(' + this.props.scroll + '%)'
 	            };
 	            newData.forEach(function (value, i) {
 	                lyrics.push(_react2.default.createElement(
@@ -23852,17 +23939,162 @@
 /* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Playlist = function (_Component) {
+	  _inherits(Playlist, _Component);
+
+	  function Playlist(props) {
+	    _classCallCheck(this, Playlist);
+
+	    var _this = _possibleConstructorReturn(this, (Playlist.__proto__ || Object.getPrototypeOf(Playlist)).call(this, props));
+
+	    _this.handleClick = _this.handleClick.bind(_this);
+	    return _this;
+	  }
+
+	  _createClass(Playlist, [{
+	    key: "handleClick",
+	    value: function handleClick(e) {
+	      this.props.changeMusic(e.target.dataset.num);
+	    }
+	  }, {
+	    key: "render",
+	    value: function render() {
+	      var _this2 = this;
+
+	      var style = {
+	        backgroundColor: this.props.color.sub,
+	        color: this.props.color.main
+	      };
+	      return _react2.default.createElement(
+	        "div",
+	        { className: this.props.class },
+	        _react2.default.createElement("div", { className: "backdrop", onClick: this.props.handlePlaylistBtn }),
+	        _react2.default.createElement(NowPlaying, { onClick: this.props.handlePlaylistBtn,
+	          "class": "nowPlaying",
+	          data: this.props.audioData
+	        }),
+	        _react2.default.createElement(
+	          "div",
+	          { className: "playlist__item-wrapper" },
+	          this.props.playlist.map(function (data, i) {
+	            var style = {
+	              transitionDelay: i / 7 + 's'
+	            };
+	            return _react2.default.createElement(Item, {
+	              key: i,
+	              num: i,
+	              "class": "playlist__item",
+	              album: data.audioData.album,
+	              title: data.audioData.title,
+	              artist: data.audioData.artist,
+	              cover: data.audioData.cover,
+	              css: style,
+	              onClick: _this2.handleClick
+	            });
+	          })
+	        )
+	      );
+	    }
+	  }]);
+
+	  return Playlist;
+	}(_react.Component);
+
+	var Item = function Item(props) {
+	  return _react2.default.createElement(
+	    "div",
+	    {
+	      onClick: props.onClick,
+	      style: props.css,
+	      className: props.class,
+	      "data-num": props.num },
+	    _react2.default.createElement("img", { className: props.class + '-cover', src: props.cover }),
+	    _react2.default.createElement(
+	      "div",
+	      { className: props.class + '-infoBox' },
+	      _react2.default.createElement(
+	        "span",
+	        { className: props.class + '-title' },
+	        props.title
+	      ),
+	      _react2.default.createElement(
+	        "span",
+	        { className: props.class + '-artist' },
+	        props.artist
+	      ),
+	      _react2.default.createElement(
+	        "span",
+	        { className: props.class + '-album' },
+	        props.album
+	      )
+	    )
+	  );
+	};
+
+	var NowPlaying = function NowPlaying(props) {
+	  return _react2.default.createElement(
+	    "div",
+	    { className: props.class, onClick: props.onClick },
+	    _react2.default.createElement("img", { className: props.class + '-cover', src: props.data.cover }),
+	    _react2.default.createElement(
+	      "div",
+	      { className: props.class + '-infoBox' },
+	      _react2.default.createElement(
+	        "span",
+	        { className: props.class + '-title' },
+	        props.data.title
+	      ),
+	      _react2.default.createElement(
+	        "span",
+	        { className: props.class + '-artist' },
+	        props.data.artist
+	      ),
+	      _react2.default.createElement(
+	        "span",
+	        { className: props.class + '-album' },
+	        props.data.album
+	      )
+	    )
+	  );
+	};
+
+	exports.default = Playlist;
+
+/***/ },
+/* 212 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
-	const MediaFileReader = __webpack_require__(212);
-	const NodeFileReader = __webpack_require__(214);
-	const XhrFileReader = __webpack_require__(221);
-	const BlobFileReader = __webpack_require__(223);
-	const ArrayFileReader = __webpack_require__(224);
-	const MediaTagReader = __webpack_require__(225);
-	const ID3v1TagReader = __webpack_require__(226);
-	const ID3v2TagReader = __webpack_require__(227);
-	const MP4TagReader = __webpack_require__(229);
+	const MediaFileReader = __webpack_require__(213);
+	const NodeFileReader = __webpack_require__(215);
+	const XhrFileReader = __webpack_require__(222);
+	const BlobFileReader = __webpack_require__(224);
+	const ArrayFileReader = __webpack_require__(225);
+	const MediaTagReader = __webpack_require__(226);
+	const ID3v1TagReader = __webpack_require__(227);
+	const ID3v2TagReader = __webpack_require__(228);
+	const MP4TagReader = __webpack_require__(230);
 
 	var mediaFileReaders = [];
 	var mediaTagReaders = [];
@@ -24103,12 +24335,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 212 */
+/* 213 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const StringUtils = __webpack_require__(213);
+	const StringUtils = __webpack_require__(214);
 
 	class MediaFileReader {
 
@@ -24305,7 +24537,7 @@
 	module.exports = MediaFileReader;
 
 /***/ },
-/* 213 */
+/* 214 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24414,15 +24646,15 @@
 	module.exports = StringUtils;
 
 /***/ },
-/* 214 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process, Buffer) {'use strict';
 
-	const fs = __webpack_require__(219);
+	const fs = __webpack_require__(220);
 
-	const ChunkedFileData = __webpack_require__(220);
-	const MediaFileReader = __webpack_require__(212);
+	const ChunkedFileData = __webpack_require__(221);
+	const MediaFileReader = __webpack_require__(213);
 
 	class NodeFileReader extends MediaFileReader {
 
@@ -24508,10 +24740,10 @@
 	}
 
 	module.exports = NodeFileReader;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(215).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(216).Buffer))
 
 /***/ },
-/* 215 */
+/* 216 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -24524,9 +24756,9 @@
 
 	'use strict'
 
-	var base64 = __webpack_require__(216)
-	var ieee754 = __webpack_require__(217)
-	var isArray = __webpack_require__(218)
+	var base64 = __webpack_require__(217)
+	var ieee754 = __webpack_require__(218)
+	var isArray = __webpack_require__(219)
 
 	exports.Buffer = Buffer
 	exports.SlowBuffer = SlowBuffer
@@ -26307,7 +26539,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 216 */
+/* 217 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -26427,7 +26659,7 @@
 
 
 /***/ },
-/* 217 */
+/* 218 */
 /***/ function(module, exports) {
 
 	exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -26517,7 +26749,7 @@
 
 
 /***/ },
-/* 218 */
+/* 219 */
 /***/ function(module, exports) {
 
 	var toString = {}.toString;
@@ -26528,13 +26760,13 @@
 
 
 /***/ },
-/* 219 */
+/* 220 */
 /***/ function(module, exports) {
 
 	
 
 /***/ },
-/* 220 */
+/* 221 */
 /***/ function(module, exports) {
 
 	/**
@@ -26733,13 +26965,13 @@
 	module.exports = ChunkedFileData;
 
 /***/ },
-/* 221 */
+/* 222 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const ChunkedFileData = __webpack_require__(220);
-	const MediaFileReader = __webpack_require__(212);
+	const ChunkedFileData = __webpack_require__(221);
+	const MediaFileReader = __webpack_require__(213);
 
 	const CHUNK_SIZE = 1024;
 
@@ -27001,7 +27233,7 @@
 	  _createXHRObject() {
 	    if (typeof window === "undefined") {
 	      // $FlowIssue - flow is not able to recognize this module.
-	      return new (__webpack_require__(222).XMLHttpRequest)();
+	      return new (__webpack_require__(223).XMLHttpRequest)();
 	    }
 
 	    if (window.XMLHttpRequest) {
@@ -27021,20 +27253,20 @@
 	module.exports = XhrFileReader;
 
 /***/ },
-/* 222 */
+/* 223 */
 /***/ function(module, exports) {
 
 	module.exports = XMLHttpRequest;
 
 
 /***/ },
-/* 223 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const ChunkedFileData = __webpack_require__(220);
-	const MediaFileReader = __webpack_require__(212);
+	const ChunkedFileData = __webpack_require__(221);
+	const MediaFileReader = __webpack_require__(213);
 
 	class BlobFileReader extends MediaFileReader {
 
@@ -27085,12 +27317,12 @@
 	module.exports = BlobFileReader;
 
 /***/ },
-/* 224 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
-	var MediaFileReader = __webpack_require__(212);
+	var MediaFileReader = __webpack_require__(213);
 
 	class ArrayFileReader extends MediaFileReader {
 
@@ -27119,15 +27351,15 @@
 	}
 
 	module.exports = ArrayFileReader;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(215).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(216).Buffer))
 
 /***/ },
-/* 225 */
+/* 226 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const MediaFileReader = __webpack_require__(212);
+	const MediaFileReader = __webpack_require__(213);
 
 	class MediaTagReader {
 
@@ -27224,13 +27456,13 @@
 	module.exports = MediaTagReader;
 
 /***/ },
-/* 226 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(225);
-	var MediaFileReader = __webpack_require__(212);
+	var MediaTagReader = __webpack_require__(226);
+	var MediaFileReader = __webpack_require__(213);
 
 	class ID3v1TagReader extends MediaTagReader {
 	  static getTagIdentifierByteRange() {
@@ -27306,15 +27538,15 @@
 	module.exports = ID3v1TagReader;
 
 /***/ },
-/* 227 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(225);
-	var MediaFileReader = __webpack_require__(212);
-	var ArrayFileReader = __webpack_require__(224);
-	var ID3v2FrameReader = __webpack_require__(228);
+	var MediaTagReader = __webpack_require__(226);
+	var MediaFileReader = __webpack_require__(213);
+	var ArrayFileReader = __webpack_require__(225);
+	var ID3v2FrameReader = __webpack_require__(229);
 
 	const ID3_HEADER_SIZE = 10;
 
@@ -27740,12 +27972,12 @@
 	module.exports = ID3v2TagReader;
 
 /***/ },
-/* 228 */
+/* 229 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaFileReader = __webpack_require__(212);
+	var MediaFileReader = __webpack_require__(213);
 
 	var ID3v2FrameReader = {
 	  getFrameReaderFunction: function (frameId) {
@@ -27918,7 +28150,7 @@
 	module.exports = ID3v2FrameReader;
 
 /***/ },
-/* 229 */
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -27931,8 +28163,8 @@
 	 */
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(225);
-	var MediaFileReader = __webpack_require__(212);
+	var MediaTagReader = __webpack_require__(226);
+	var MediaFileReader = __webpack_require__(213);
 
 	class MP4TagReader extends MediaTagReader {
 	  static getTagIdentifierByteRange() {
@@ -28214,7 +28446,7 @@
 	module.exports = MP4TagReader;
 
 /***/ },
-/* 230 */
+/* 231 */
 /***/ function(module, exports) {
 
 	/*!
@@ -28833,7 +29065,7 @@
 
 
 /***/ },
-/* 231 */
+/* 232 */
 /***/ function(module, exports) {
 
 	'use strict';
