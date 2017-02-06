@@ -161,7 +161,6 @@ body{
 	right: 0;
 	bottom: 0;
 	z-index: 2;
-	padding: 2rem;
 	width: 38rem;
 	height: 11rem;		
 	transition: all 0.3s 0.15s;	
@@ -183,20 +182,13 @@ body{
 	position: fixed;
 	left: 0;
 	top: 0;
-	width: 100vw;
+	width: calc(100vw - 45rem);
 	height: 100vh;
-	opacity: 0;
-	background-color: rgba(0,0,0,0.6);
-	transition: all 0.3s;
-}
-
-.playlist.show .backdrop{
-	opacity: 1;
 }
 
 .playlist__item-wrapper{
-	margin-top: 1rem;
-	height: calc(100% - 15rem);
+	padding: 0 2rem;
+	height: calc(100% - 20rem);
 	overflow-y:auto;	
 	overflow-x: hidden;
 }
@@ -259,6 +251,7 @@ body{
 .nowPlaying{	
 	display: flex;
 	position: relative;	
+	padding: 2rem;
 }
 
 .nowPlaying-cover{

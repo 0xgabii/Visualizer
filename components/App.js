@@ -272,22 +272,16 @@ class App extends Component {
     this.setState({ showPlaylist: !this.state.showPlaylist });
   }
   changeMusic(num) {
-    if (num >= this.state.playlist.length)
+    if (num === this.state.playlist.length)
       num = 0;
-    else if (num < 0)
-      num = this.state.playlist.length - 1;
-
     this.changeState_audioData(this.state.playlist[num].audioData);
-    this.setState({ currentPlay: num });
-
-    console.log(this.state.currentPlay);
+    this.setState({ currentPlay: num });    
   }
   musicEnded() {
-    let musicIdx = this.state.currentPlay,
-      playlistLenght = this.state.playlist.length;
-
+    let musicIdx = Number(this.state.currentPlay);
+    musicIdx += 1;
     // When there is more than one song
-    if (playlistLenght > 1) this.changeMusic(musicIdx + 1)
+    if (this.state.playlist.length > 1) this.changeMusic(musicIdx);
   }
   render() {
     const styles = {

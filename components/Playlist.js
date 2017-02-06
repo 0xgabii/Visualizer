@@ -23,12 +23,11 @@ class Playlist extends Component {
         <div className="playlist__item-wrapper">
           {this.props.playlist.map((data, i) => {
             const style = {
-              transitionDelay: i / 7 + 's'
+              transitionDelay: i / 13 + 's'
             }
             return (
               <Item
-                key={i}
-                num={i}
+                key={i} num={i}
                 class="playlist__item"
                 album={data.audioData.album}
                 title={data.audioData.title}
