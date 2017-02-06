@@ -24057,7 +24057,7 @@
 	  return _react2.default.createElement(
 	    "div",
 	    { className: props.class, onClick: props.onClick },
-	    props.data.cover ? _react2.default.createElement("img", { className: props.class + '-cover', src: props.data.cover }) : '',
+	    _react2.default.createElement("img", { className: props.class + '-cover', src: props.data.cover }),
 	    _react2.default.createElement(
 	      "div",
 	      { className: props.class + '-infoBox' },
