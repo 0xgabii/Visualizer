@@ -64,10 +64,7 @@ const Item = (props) => {
 const NowPlaying = (props) => {
   return (
     <div className={props.class} onClick={props.onClick}>
-      {props.data.cover ?
-        <img className={props.class + '-cover'} src={props.data.cover} />
-        : ''
-      }
+      <img className={props.class + '-cover'} src={props.data.cover} />
       <div className={props.class + '-infoBox'}>
         <span className={props.class + '-title'}>{props.data.title}</span>
         <span className={props.class + '-artist'}>{props.data.artist}</span>
