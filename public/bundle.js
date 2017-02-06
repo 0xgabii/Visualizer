@@ -24001,7 +24001,7 @@
 	          { className: "playlist__item-wrapper" },
 	          this.props.playlist.map(function (data, i) {
 	            var style = {
-	              transitionDelay: i / 13 + 's'
+	              transitionDelay: i < 15 ? i / 13 + 's' : '0s'
 	            };
 	            return _react2.default.createElement(Item, {
 	              key: i, num: i,
