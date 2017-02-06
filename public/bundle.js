@@ -21881,21 +21881,17 @@
 	  }, {
 	    key: 'changeMusic',
 	    value: function changeMusic(num) {
-	      if (num >= this.state.playlist.length) num = 0;else if (num < 0) num = this.state.playlist.length - 1;
-
+	      if (num === this.state.playlist.length) num = 0;
 	      this.changeState_audioData(this.state.playlist[num].audioData);
 	      this.setState({ currentPlay: num });
-
-	      console.log(this.state.currentPlay);
 	    }
 	  }, {
 	    key: 'musicEnded',
 	    value: function musicEnded() {
-	      var musicIdx = this.state.currentPlay,
-	          playlistLenght = this.state.playlist.length;
-
+	      var musicIdx = Number(this.state.currentPlay);
+	      musicIdx += 1;
 	      // When there is more than one song
-	      if (playlistLenght > 1) this.changeMusic(musicIdx + 1);
+	      if (this.state.playlist.length > 1) this.changeMusic(musicIdx);
 	    }
 	  }, {
 	    key: 'render',
@@ -24005,11 +24001,10 @@
 	          { className: "playlist__item-wrapper" },
 	          this.props.playlist.map(function (data, i) {
 	            var style = {
-	              transitionDelay: i / 7 + 's'
+	              transitionDelay: i / 13 + 's'
 	            };
 	            return _react2.default.createElement(Item, {
-	              key: i,
-	              num: i,
+	              key: i, num: i,
 	              "class": "playlist__item",
 	              album: data.audioData.album,
 	              title: data.audioData.title,
