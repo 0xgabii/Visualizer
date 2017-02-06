@@ -195,7 +195,7 @@ body{
 
 .playlist__item{
 	display: flex;
-	margin: 0.8rem 0;
+	margin-bottom: 0.7rem;
 	opacity: 0;
 	transform: translateX(10rem);
 	transition: opacity 0.5s,
