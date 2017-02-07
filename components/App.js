@@ -36,13 +36,19 @@ class App extends Component {
         main: 'black',
         sub: 'white'
       },
-      showLyrics: false,
-      findLyrics: false,
-      lyrics: [],
-      showPlaylist: false,
-      playlist: [],
-      currentPlay: 0,// current music in playlist idx 
-      scroll: 0.5,
+      lyrics: {
+        data: [],
+        scroll: 0.5,
+        show: false,
+        find: false
+      },
+      playlist: {
+        data: [],
+        currentPlay: 0,
+        playing: false,
+        random: false,
+        replay: false
+      }
     }
     this.handlePlay = this.handlePlay.bind(this);
     this.fileChange = this.fileChange.bind(this);
@@ -115,7 +121,7 @@ class App extends Component {
   }
   fileChange(e) {
     const files = e.target.files,
-      playlist = this.state.playlist;
+      playlist = this.state.playlist.data;
 
     for (let i = 0; i < files.length; i++) {
       let file = files[i],
@@ -156,8 +162,15 @@ class App extends Component {
           // when finished
           if (i == files.length - 1) whenFinished();
         },
+        // if do not have ID3 tags
         onError: error => {
-          Toast('Failed to read file', 'default');
+          music.audioData = {
+            src: dataFile
+          }
+          playlist.push(music);
+
+          // when finished
+          if (i == files.length - 1) whenFinished();
         }
       });
     }// end for Loop  
@@ -166,9 +179,15 @@ class App extends Component {
     const whenFinished = () => {
       if (files.length > 0) Toast(`${files.length} songs have been added to the playlist`, 'default');
 
-      this.setState({ playlist: playlist });
+      this.setState({
+        playlist: update(
+          this.state.playlist, {
+            data: { $set: playlist }
+          }
+        )
+      });
 
-      if (!this.state.audioData.src) this.changeState_audioData(playlist[this.state.currentPlay].audioData);
+      if (!this.state.audioData.src) this.changeState_audioData(playlist[this.state.playlist.currentPlay].audioData);
     }
   }
   changeState_colors(image) {
@@ -205,7 +224,16 @@ class App extends Component {
         }
       )
     }, () => {
-      this.setState({ lyrics: [], showLyrics: false, scroll: 0.5 });
+      // reset lyrics State
+      this.setState({
+        lyrics: update(
+          this.state.lyrics, {
+            data: { $set: [] },
+            show: { $set: false },
+            scroll: { $set: 0.5 }
+          }
+        )
+      });
       // find lyrics
       this.getLyrics(this.state.audioData.artist, this.state.audioData.title);
       // change Colors      
@@ -222,14 +250,32 @@ class App extends Component {
     // e.deltaY > 0 ? Down : Up
     let deltaY = e.deltaY > 0 ? -3 : 3;
 
-    if (this.state.scroll + deltaY <= -100 || this.state.scroll + deltaY >= 1) {
-      this.setState({ scroll: this.state.scroll });
+    if (this.state.lyrics.scroll + deltaY <= -100 || this.state.lyrics.scroll + deltaY >= 1) {
+      this.setState({
+        lyrics: update(
+          this.state.lyrics, {
+            scroll: { $set: this.state.lyrics.scroll }
+          }
+        )
+      });
     } else {
-      this.setState({ scroll: this.state.scroll + deltaY });
+      this.setState({
+        lyrics: update(
+          this.state.lyrics, {
+            scroll: { $set: this.state.lyrics.scroll + deltaY }
+          }
+        )
+      });
     }
   }
   handleLyricsBtn() {
-    this.setState({ showLyrics: !this.state.showLyrics });
+    this.setState({
+      lyrics: update(
+        this.state.lyrics, {
+          show: { $set: !this.state.lyrics.show }
+        }
+      )
+    });
   }
   colorReversal() {
     this.setState({
@@ -243,7 +289,13 @@ class App extends Component {
   }
   // show form
   handleFindLyricsBtn() {
-    this.setState({ findLyrics: !this.state.findLyrics });
+    this.setState({
+      lyrics: update(
+        this.state.lyrics, {
+          find: { $set: !this.state.lyrics.find }
+        }
+      )
+    });
   }
   // submit form
   findLyrics(e) {
@@ -257,31 +309,63 @@ class App extends Component {
   // ajax request to Find Lyrics
   getLyrics(artist, title) {
     // alert
-    if (!this.state.showLyrics) Toast('Only lyrics in English can be searched', 'default');
+    if (!this.state.lyrics.data) Toast('Only lyrics in English can be searched', 'default');
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
       .then((response) => {
         let data = response.data;
-        this.setState({ lyrics: data ? data.split('\n') : this.state.lyrics });
 
-        data ? Toast('Lyrics Found!', 'success') : Toast('Lyrics Not Found!', 'default');
-        if (data) this.setState({ showLyrics: true, findLyrics: false });
+        // update State
+        this.setState({
+          lyrics: update(
+            this.state.lyrics, {
+              data: { $set: data ? data.split('\n') : this.state.lyrics.data }
+            }
+          )
+        });
+
+        if (!data) {
+          Toast('Lyrics Not Found!', 'default');
+        } else {
+          Toast('Lyrics Found!', 'success');
+          // update State
+          this.setState({
+            lyrics: update(
+              this.state.lyrics, {
+                show: { $set: true },
+                find: { $set: false }
+              }
+            )
+          });
+        }
       }).catch((error) => { console.log(error); });
   }
   handlePlaylistBtn() {
-    this.setState({ showPlaylist: !this.state.showPlaylist });
+    this.setState({
+      playlist: update(
+        this.state.playlist, {
+          show: { $set: !this.state.playlist.show }
+        }
+      )
+    });
   }
   changeMusic(num) {
-    if (num === this.state.playlist.length)
+    if (num === this.state.playlist.data.length)
       num = 0;
-    this.changeState_audioData(this.state.playlist[num].audioData);
-    this.setState({ currentPlay: num });
+    this.changeState_audioData(this.state.playlist.data[num].audioData);
+    this.setState({
+      playlist: update(
+        this.state.playlist, {
+          currentPlay: { $set: num }
+        }
+      )
+    });
   }
   // when Music End
   musicEnded() {
-    let musicIdx = Number(this.state.currentPlay);
+    let musicIdx = Number(this.state.playlist.currentPlay);
     musicIdx += 1;
     // When there is more than one song
-    if (this.state.playlist.length > 1) this.changeMusic(musicIdx);
+    if (this.state.playlist.data.length > 1) this.changeMusic(musicIdx);
   }
   render() {
     const styles = {
@@ -307,27 +391,27 @@ class App extends Component {
 
           musicEnded={this.musicEnded}
 
-          findLyrics={this.state.findLyrics}
-          showLyrics={this.state.showLyrics}
+          findLyrics={this.state.lyrics.find}
+          showLyrics={this.state.lyrics.show}
         />
         <Visualizer
-          class={this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer'}
+          class={this.state.lyrics.show ? 'visualizer showLyrics' : 'visualizer'}
           color={this.state.colors.sub}
           data={this.state.audioData}
           settings={this.state.visualizeSet}
           isMounted={this.visualizing}
         />
         <Lyrics
-          class={this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics'}
+          class={this.state.lyrics.show ? 'lyrics showLyrics' : 'lyrics'}
           color={this.state.colors.main}
-          data={this.state.lyrics}
-          scroll={this.state.scroll}
+          data={this.state.lyrics.data}
+          scroll={this.state.lyrics.scroll}
           lyricsMounted={this.lyricsMounted}
         />
         <Playlist
-          class={this.state.showPlaylist ? 'playlist show' : 'playlist'}
+          class={this.state.playlist.show ? 'playlist show' : 'playlist'}
           color={this.state.colors}
-          playlist={this.state.playlist}
+          playlist={this.state.playlist.data}
           changeMusic={this.changeMusic}
           handlePlaylistBtn={this.handlePlaylistBtn}
           audioData={this.state.audioData}
