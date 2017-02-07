@@ -52,12 +52,12 @@ class App extends Component {
     this.findLyrics = this.findLyrics.bind(this);
     this.colorReversal = this.colorReversal.bind(this);
     this.useMic = this.useMic.bind(this);
-    this.openFindLyrics = this.openFindLyrics.bind(this);
+    this.handleFindLyricsBtn = this.handleFindLyricsBtn.bind(this);
     this.lyricsMounted = this.lyricsMounted.bind(this);
     this.wheelEvent = this.wheelEvent.bind(this);
     this.changeState_colors = this.changeState_colors.bind(this);
     this.changeState_audioData = this.changeState_audioData.bind(this);
-    this.showPlaylist = this.showPlaylist.bind(this);
+    this.handlePlaylistBtn = this.handlePlaylistBtn.bind(this);
     this.changeMusic = this.changeMusic.bind(this);
     this.musicEnded = this.musicEnded.bind(this);
 
@@ -78,6 +78,16 @@ class App extends Component {
     this.anMic.smoothingTimeConstant = 0.7;
     this.anMic.fftSize = 2048;
     this.frequencyData = new Uint8Array(this.anMic.frequencyBinCount);
+  }
+  useMic() {
+    navigator.getUserMedia({ audio: true }, (stream) => {
+      const audioContext = this.acMic,
+        analyser = this.anMic,
+        microphone = audioContext.createMediaStreamSource(stream);
+
+      microphone.connect(analyser);
+      analyser.connect(audioContext.destination);
+    }, (error) => { console.log(error); });
   }
   visualizing() {
     let frequencyData = this.frequencyData,
@@ -103,16 +113,6 @@ class App extends Component {
 
     source.connect(analyser);
     analyser.connect(audioContext.destination);
-  }
-  useMic() {
-    navigator.getUserMedia({ audio: true }, (stream) => {
-      const audioContext = this.acMic,
-        analyser = this.anMic,
-        microphone = audioContext.createMediaStreamSource(stream);
-
-      microphone.connect(analyser);
-      analyser.connect(audioContext.destination);
-    }, (error) => { console.log(error); });
   }
   fileChange(e) {
     const files = e.target.files,
@@ -213,19 +213,6 @@ class App extends Component {
       this.changeState_colors(this.state.audioData.cover);
     });
   }
-  handleLyricsBtn() {
-    this.setState({ showLyrics: !this.state.showLyrics });
-  }
-  colorReversal() {
-    this.setState({
-      colors: update(
-        this.state.colors, {
-          main: { $set: this.state.colors.sub },
-          sub: { $set: this.state.colors.main }
-        }
-      )
-    });
-  }
   // when lyrics Component Mounted
   lyricsMounted() {
     const lyrics = document.querySelector('.lyrics');
@@ -242,8 +229,21 @@ class App extends Component {
       this.setState({ scroll: this.state.scroll + deltaY });
     }
   }
+  handleLyricsBtn() {
+    this.setState({ showLyrics: !this.state.showLyrics });
+  }
+  colorReversal() {
+    this.setState({
+      colors: update(
+        this.state.colors, {
+          main: { $set: this.state.colors.sub },
+          sub: { $set: this.state.colors.main }
+        }
+      )
+    });
+  }
   // show form
-  openFindLyrics() {
+  handleFindLyricsBtn() {
     this.setState({ findLyrics: !this.state.findLyrics });
   }
   // submit form
@@ -268,15 +268,16 @@ class App extends Component {
         if (data) this.setState({ showLyrics: true, findLyrics: false });
       }).catch((error) => { console.log(error); });
   }
-  showPlaylist() {
+  handlePlaylistBtn() {
     this.setState({ showPlaylist: !this.state.showPlaylist });
   }
   changeMusic(num) {
     if (num === this.state.playlist.length)
       num = 0;
     this.changeState_audioData(this.state.playlist[num].audioData);
-    this.setState({ currentPlay: num });    
+    this.setState({ currentPlay: num });
   }
+  // when Music End
   musicEnded() {
     let musicIdx = Number(this.state.currentPlay);
     musicIdx += 1;
@@ -301,7 +302,7 @@ class App extends Component {
           handleSubmit={this.findLyrics}
 
           handleLyricsBtn={this.handleLyricsBtn}
-          handleFindLyricsBtn={this.openFindLyrics}
+          handleFindLyricsBtn={this.handleFindLyricsBtn}
           handleReversalBtn={this.colorReversal}
           handleMicBtn={this.useMic}
 
@@ -329,7 +330,7 @@ class App extends Component {
           color={this.state.colors}
           playlist={this.state.playlist}
           changeMusic={this.changeMusic}
-          handlePlaylistBtn={this.showPlaylist}
+          handlePlaylistBtn={this.handlePlaylistBtn}
           audioData={this.state.audioData}
         />
       </div>
