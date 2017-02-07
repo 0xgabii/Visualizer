@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 
 class Playlist extends Component {
-  constructor(props) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-  }
-  handleClick(e) {
-    this.props.changeMusic(e.target.dataset.num);
+  handleClick(num, obj) {
+    this.props.changeMusic(num);
   }
   render() {
     const style = {
@@ -15,10 +11,14 @@ class Playlist extends Component {
     }
     return (
       <div className={this.props.class}>
-        <div className="backdrop" onClick={this.props.handlePlaylistBtn}></div>
-        <NowPlaying onClick={this.props.handlePlaylistBtn}
+        <div
+          className="backdrop"
+          onClick={this.props.handlePlaylistBtn}>
+        </div>
+        <NowPlaying
           class="nowPlaying"
           data={this.props.audioData}
+          onClick={this.props.handlePlaylistBtn}
         />
         <div className="playlist__item-wrapper">
           {this.props.playlist.map((data, i) => {
@@ -27,14 +27,14 @@ class Playlist extends Component {
             }
             return (
               <Item
-                key={i} num={i}
+                key={i}
                 class="playlist__item"
                 album={data.audioData.album}
                 title={data.audioData.title}
                 artist={data.audioData.artist}
                 cover={data.audioData.cover}
                 css={style}
-                onClick={this.handleClick}
+                onClick={this.handleClick.bind(this, i)}
               />
             )
           })}
@@ -49,8 +49,7 @@ const Item = (props) => {
     <div
       onClick={props.onClick}
       style={props.css}
-      className={props.class}
-      data-num={props.num} >
+      className={props.class}>
       <img className={props.class + '-cover'} src={props.cover} />
       <div className={props.class + '-infoBox'}>
         <span className={props.class + '-title'}>{props.title}</span>
