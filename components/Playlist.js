@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import NowPlaying from './NowPlaying';
+import Item from './PlaylistItem';
 
 class Playlist extends Component {
   handleClick(num, obj) {
@@ -43,34 +45,5 @@ class Playlist extends Component {
     );
   }
 }
-
-const Item = (props) => {
-  return (
-    <div
-      onClick={props.onClick}
-      style={props.css}
-      className={props.class}>
-      <img className={props.class + '-cover'} src={props.cover} />
-      <div className={props.class + '-infoBox'}>
-        <span className={props.class + '-title'}>{props.title}</span>
-        <span className={props.class + '-artist'}>{props.artist}</span>
-        <span className={props.class + '-album'}>{props.album}</span>
-      </div>
-    </div>
-  );
-};
-
-const NowPlaying = (props) => {
-  return (
-    <div className={props.class} onClick={props.onClick}>
-      <img className={props.class + '-cover'} src={props.data.cover} />
-      <div className={props.class + '-infoBox'}>
-        <span className={props.class + '-title'}>{props.data.title}</span>
-        <span className={props.class + '-artist'}>{props.data.artist}</span>
-        <span className={props.class + '-album'}>{props.data.album}</span>
-      </div>
-    </div>
-  );
-};
 
 export default Playlist;

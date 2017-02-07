@@ -2,10 +2,13 @@ import React from 'react';
 
 const NowPlaying = (props) => {
   return (
-    <div className="nowPlaying">      
-      <h3 className="nowPlaying__artist">{props.data.artist}</h3>
-      <h3 className="nowPlaying__title">{props.data.title}</h3>
-      <h3 className="nowPlaying__album">{props.data.album}</h3>
+    <div className={props.class} onClick={props.onClick}>
+      <img className={props.class + '-cover'} src={props.data.cover} />
+      <div className={props.class + '-infoBox'}>
+        <span className={props.class + '-title'}>{props.data.title}</span>
+        <span className={props.class + '-artist'}>{props.data.artist}</span>
+        <span className={props.class + '-album'}>{props.data.album}</span>
+      </div>
     </div>
   );
 };
