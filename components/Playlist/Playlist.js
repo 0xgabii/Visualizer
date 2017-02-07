@@ -8,10 +8,6 @@ class Playlist extends Component {
     this.props.changeMusic(num);
   }
   render() {
-    const style = {
-      backgroundColor: this.props.color.sub,
-      color: this.props.color.main
-    }
     return (
       <div className={this.props.class}>
         <div
@@ -25,6 +21,10 @@ class Playlist extends Component {
         />
         <Control
           class="playlistControl" 
+          color={this.props.color.sub}
+          playing={this.props.playing}
+          random={this.props.random}
+          repeat={this.props.repeat}          
         />
         <div className="playlist__item-wrapper">
           {this.props.playlist.map((data, i) => {

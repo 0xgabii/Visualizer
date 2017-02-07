@@ -293,17 +293,18 @@ body{
 	padding: 1rem;
 	width: 20%;
     background-color: transparent;
-	border: none;
-    color: white;
+	border: none;    
     font-size: 1.5rem;
 	outline: none;
 	transition: all 0.3s;
 }
-.playlistControl > button:hover {
-	background-color:rgba(255, 255,255, 0.3);
+
+.playlist.show .playlistControl > button {
+	color: white !important; 
 }
-.playlistControl > button.active{
-	background-color:rgba(255, 255,255, 0.3);
+
+.playlistControl > button:hover {
+	background-color:rgba(255, 255,255, 0.15);
 }
 
 .toast {
