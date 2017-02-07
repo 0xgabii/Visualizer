@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import NowPlaying from './NowPlaying';
-import Item from './PlaylistItem';
+import Control from './Control';
+import Item from './listitem';
 
 class Playlist extends Component {
   handleClick(num, obj) {
@@ -22,6 +23,7 @@ class Playlist extends Component {
           data={this.props.audioData}
           onClick={this.props.handlePlaylistBtn}
         />
+        <Control />
         <div className="playlist__item-wrapper">
           {this.props.playlist.map((data, i) => {
             const style = {

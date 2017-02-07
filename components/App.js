@@ -4,9 +4,8 @@ import axios from 'axios';
 import Visualizer from './Visualizer';
 import Controller from './Controller';
 import Header from './Header';
-import NowPlaying from './NowPlaying';
 import Lyrics from './Lyrics';
-import Playlist from './Playlist';
+import Playlist from './Playlist/Playlist';
 //get audio file info
 import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage

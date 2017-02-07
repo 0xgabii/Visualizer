@@ -22,6 +22,7 @@
     "jsmediatags": "^3.3.2",
     "react": "^15.4.2",
     "react-addons-update": "^15.4.2",
-    "react-dom": "^15.4.2"
+    "react-dom": "^15.4.2",
+    "semantic-ui-icon": "^2.2.3"
   }
 }
