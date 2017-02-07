@@ -23,7 +23,9 @@ class Playlist extends Component {
           data={this.props.audioData}
           onClick={this.props.handlePlaylistBtn}
         />
-        <Control />
+        <Control
+          class="playlistControl" 
+        />
         <div className="playlist__item-wrapper">
           {this.props.playlist.map((data, i) => {
             const style = {

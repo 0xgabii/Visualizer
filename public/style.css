@@ -162,7 +162,7 @@ body{
 	bottom: 0;
 	z-index: 2;
 	width: 38rem;
-	height: 11rem;		
+	height: 14rem;		
 	transition: all 0.3s 0.15s;	
 }	
 .playlist:not(.show):hover{
@@ -188,7 +188,7 @@ body{
 
 .playlist__item-wrapper{
 	padding: 0 2rem;
-	height: calc(100% - 20rem);
+	height: calc(100% - 23rem);
 	overflow-y:auto;	
 	overflow-x: hidden;
 }
@@ -239,7 +239,7 @@ body{
 .nowPlaying{	
 	display: flex;
 	position: relative;	
-	padding: 2rem;
+	padding: 2rem 2rem 1rem 2rem;
 }
 
 .nowPlaying-cover{
@@ -284,6 +284,26 @@ body{
 }
 .playlist.show .nowPlaying-album{
 	font-size: 1.3rem;
+}
+
+.playlistControl{
+	margin-bottom: 1rem;
+}
+.playlistControl > button {
+	padding: 1rem;
+	width: 20%;
+    background-color: transparent;
+	border: none;
+    color: white;
+    font-size: 1.5rem;
+	outline: none;
+	transition: all 0.3s;
+}
+.playlistControl > button:hover {
+	background-color:rgba(255, 255,255, 0.3);
+}
+.playlistControl > button.active{
+	background-color:rgba(255, 255,255, 0.3);
 }
 
 .toast {
