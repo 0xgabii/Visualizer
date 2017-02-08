@@ -33,8 +33,8 @@ class App extends Component {
         cover: ''
       },
       colors: {
-        main: 'black',
-        sub: 'white'
+        main: 'rgb(27, 30, 43)',
+        sub: 'rgb(229, 206, 208)'
       },
       lyrics: {
         data: [],
