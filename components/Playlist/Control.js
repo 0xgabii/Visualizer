@@ -6,23 +6,27 @@ const Control = (props) => {
   }
   return (
     <div className={props.class}>
-      <button style={color}>
-        <i className="step backward icon"></i>
+      <button style={color} onClick={props.prevMusic}>
+        <i className='step backward icon'></i>
       </button>
-      <button style={color}>
-        {props.play
-          ? <i class="pause icon"></i>
-          : <i className="play icon"></i>
+      <button style={color} onClick={props.musicPlayControl}>
+        {props.playing
+          ? <i className='pause icon'></i>
+          : <i className='play icon'></i>
         }
       </button>
-      <button style={color}>
-        <i className="step forward icon"></i>
+      <button style={color} onClick={props.nextMusic}>
+        <i className='step forward icon'></i>
       </button>
-      <button style={color}>
-        <i className={props.random ? "random icon active" : "random icon"}></i>
+      <button style={color}
+        className={props.useRandom ? 'active' : ''}
+        onClick={props.random}>
+        <i className='random icon'></i>
       </button>
-      <button style={color}>
-        <i className={props.repeat ? "repeat icon active" : "repeat icon"}></i>
+      <button style={color}
+        className={props.useRepeat ? 'active' : ''}
+        onClick={props.repeat}>
+        <i className='repeat icon'></i>
       </button>
     </div>
   );

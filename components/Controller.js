@@ -5,6 +5,9 @@ class Controller extends Component {
     super(props);
     this.selectMusic = this.selectMusic.bind(this);
   }
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps !== this.props;
+  }
   // open input[file]
   selectMusic() {
     const file = document.getElementById('audioFile');
@@ -27,11 +30,6 @@ class Controller extends Component {
         />
         <div className="btnGroup__controller">
           <button style={btn} onClick={this.selectMusic}>Open file</button>
-          <audio crossOrigin="anonymous" controls autoPlay
-            src={this.props.src}
-            onEnded={this.props.musicEnded}
-            onLoadedData={this.props.handlePlay}
-          ></audio>
           <button style={btn} onClick={this.props.handleLyricsBtn}>{this.props.showLyrics ? 'Hide Lyrics' : 'Show Lyrics'}</button>
           <button style={btn} onClick={this.props.handleFindLyricsBtn}>{this.props.findLyrics ? 'Close' : 'Find Lyrics'}</button>
           <button style={btn} onClick={this.props.handleReversalBtn}>Color reversal</button>

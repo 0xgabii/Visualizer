@@ -45,9 +45,8 @@ class App extends Component {
       playlist: {
         data: [],
         currentPlay: 0,
-        playing: false,
         random: false,
-        replay: false
+        repeat: false
       }
     }
     this.handlePlay = this.handlePlay.bind(this);
@@ -64,7 +63,10 @@ class App extends Component {
     this.changeState_audioData = this.changeState_audioData.bind(this);
     this.handlePlaylistBtn = this.handlePlaylistBtn.bind(this);
     this.changeMusic = this.changeMusic.bind(this);
-    this.musicEnded = this.musicEnded.bind(this);
+    this.nextMusic = this.nextMusic.bind(this);
+    this.prevMusic = this.prevMusic.bind(this);
+    this.randomMusic = this.randomMusic.bind(this);
+    this.repeatMusic = this.repeatMusic.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -348,9 +350,25 @@ class App extends Component {
       )
     });
   }
+  nextMusic() {
+    let currentNum = Number(this.state.playlist.currentPlay),
+      num = currentNum + 1;  // default 
+
+    // random    
+    if (this.state.playlist.random)
+      num = Math.floor(Math.random() * this.state.playlist.data.length);
+    // repeat
+    if (this.state.playlist.repeat)
+      num = currentNum;
+
+    this.changeMusic(num);
+  }
+  prevMusic() {
+    this.changeMusic(Number(this.state.playlist.currentPlay) - 1);
+  }
   changeMusic(num) {
-    if (num === this.state.playlist.data.length)
-      num = 0;
+    if (!this.state.playlist.data[num] || this.state.playlist.data.length === 1) return;
+
     this.changeState_audioData(this.state.playlist.data[num].audioData);
     this.setState({
       playlist: update(
@@ -360,12 +378,23 @@ class App extends Component {
       )
     });
   }
-  // when Music End
-  musicEnded() {
-    let musicIdx = Number(this.state.playlist.currentPlay);
-    musicIdx += 1;
-    // When there is more than one song
-    if (this.state.playlist.data.length > 1) this.changeMusic(musicIdx);
+  randomMusic() {
+    this.setState({
+      playlist: update(
+        this.state.playlist, {
+          random: { $set: !this.state.playlist.random }
+        }
+      )
+    })
+  }
+  repeatMusic() {
+    this.setState({
+      playlist: update(
+        this.state.playlist, {
+          repeat: { $set: !this.state.playlist.repeat }
+        }
+      )
+    })
   }
   render() {
     const styles = {
@@ -378,9 +407,7 @@ class App extends Component {
         <Header />
         <Controller
           color={this.state.colors.sub}
-          src={this.state.audioData.src}
 
-          handlePlay={this.handlePlay}
           fileChange={this.fileChange}
           handleSubmit={this.findLyrics}
 
@@ -388,8 +415,6 @@ class App extends Component {
           handleFindLyricsBtn={this.handleFindLyricsBtn}
           handleReversalBtn={this.colorReversal}
           handleMicBtn={this.useMic}
-
-          musicEnded={this.musicEnded}
 
           findLyrics={this.state.lyrics.find}
           showLyrics={this.state.lyrics.show}
@@ -411,10 +436,20 @@ class App extends Component {
         <Playlist
           class={this.state.playlist.show ? 'playlist show' : 'playlist'}
           color={this.state.colors}
+          src={this.state.audioData.src}
           playlist={this.state.playlist.data}
+          audioData={this.state.audioData}
+          useRandom={this.state.playlist.random}
+          useRepeat={this.state.playlist.repeat}
+
           changeMusic={this.changeMusic}
           handlePlaylistBtn={this.handlePlaylistBtn}
-          audioData={this.state.audioData}
+
+          handlePlay={this.handlePlay}
+          nextMusic={this.nextMusic}
+          prevMusic={this.prevMusic}
+          random={this.randomMusic}
+          repeat={this.repeatMusic}
         />
       </div>
     );
