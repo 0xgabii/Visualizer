@@ -24131,7 +24131,7 @@
 	        _react2.default.createElement(_Control2.default, {
 	          'class': 'playlistControl',
 	          playing: this.state.playing,
-	          color: this.props.color.sub,
+	          color: this.props.color,
 	          random: this.props.random,
 	          repeat: this.props.repeat,
 	          useRandom: this.props.useRandom,
@@ -24236,7 +24236,11 @@
 
 	var Control = function Control(props) {
 	  var color = {
-	    color: props.color
+	    color: props.color.sub
+	  };
+	  var active = {
+	    backgroundColor: props.color.sub,
+	    color: props.color.main
 	  };
 	  return _react2.default.createElement(
 	    'div',
@@ -24258,14 +24262,16 @@
 	    ),
 	    _react2.default.createElement(
 	      'button',
-	      { style: color,
+	      {
+	        style: props.useRandom ? active : color,
 	        className: props.useRandom ? 'active' : '',
 	        onClick: props.random },
 	      _react2.default.createElement('i', { className: 'random icon' })
 	    ),
 	    _react2.default.createElement(
 	      'button',
-	      { style: color,
+	      {
+	        style: props.useRepeat ? active : color,
 	        className: props.useRepeat ? 'active' : '',
 	        onClick: props.repeat },
 	      _react2.default.createElement('i', { className: 'repeat icon' })
