@@ -77,7 +77,7 @@ class Playlist extends Component {
         <Control
           class="playlistControl"
           playing={this.state.playing}
-          color={this.props.color.sub}
+          color={this.props.color}
           random={this.props.random}
           repeat={this.props.repeat}
           useRandom={this.props.useRandom}

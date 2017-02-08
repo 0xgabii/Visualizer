@@ -21533,27 +21533,23 @@
 
 	var _Header2 = _interopRequireDefault(_Header);
 
-	var _NowPlaying = __webpack_require__(209);
-
-	var _NowPlaying2 = _interopRequireDefault(_NowPlaying);
-
-	var _Lyrics = __webpack_require__(210);
+	var _Lyrics = __webpack_require__(209);
 
 	var _Lyrics2 = _interopRequireDefault(_Lyrics);
 
-	var _Playlist = __webpack_require__(211);
+	var _Playlist = __webpack_require__(210);
 
 	var _Playlist2 = _interopRequireDefault(_Playlist);
 
-	var _jsmediatags = __webpack_require__(212);
+	var _jsmediatags = __webpack_require__(214);
 
 	var _jsmediatags2 = _interopRequireDefault(_jsmediatags);
 
-	var _colorThiefStandalone = __webpack_require__(231);
+	var _colorThiefStandalone = __webpack_require__(233);
 
 	var _colorThiefStandalone2 = _interopRequireDefault(_colorThiefStandalone);
 
-	var _Toast = __webpack_require__(232);
+	var _Toast = __webpack_require__(234);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21594,16 +21590,21 @@
 	        cover: ''
 	      },
 	      colors: {
-	        main: 'black',
-	        sub: 'white'
+	        main: 'rgb(27, 30, 43)',
+	        sub: 'rgb(229, 206, 208)'
 	      },
-	      showLyrics: false,
-	      findLyrics: false,
-	      lyrics: [],
-	      showPlaylist: false,
-	      playlist: [],
-	      currentPlay: 0, // current music in playlist idx 
-	      scroll: 0.5
+	      lyrics: {
+	        data: [],
+	        scroll: 0.5,
+	        show: false,
+	        find: false
+	      },
+	      playlist: {
+	        data: [],
+	        currentPlay: 0,
+	        random: false,
+	        repeat: false
+	      }
 	    };
 	    _this.handlePlay = _this.handlePlay.bind(_this);
 	    _this.fileChange = _this.fileChange.bind(_this);
@@ -21612,14 +21613,17 @@
 	    _this.findLyrics = _this.findLyrics.bind(_this);
 	    _this.colorReversal = _this.colorReversal.bind(_this);
 	    _this.useMic = _this.useMic.bind(_this);
-	    _this.openFindLyrics = _this.openFindLyrics.bind(_this);
+	    _this.handleFindLyricsBtn = _this.handleFindLyricsBtn.bind(_this);
 	    _this.lyricsMounted = _this.lyricsMounted.bind(_this);
 	    _this.wheelEvent = _this.wheelEvent.bind(_this);
 	    _this.changeState_colors = _this.changeState_colors.bind(_this);
 	    _this.changeState_audioData = _this.changeState_audioData.bind(_this);
-	    _this.showPlaylist = _this.showPlaylist.bind(_this);
+	    _this.handlePlaylistBtn = _this.handlePlaylistBtn.bind(_this);
 	    _this.changeMusic = _this.changeMusic.bind(_this);
-	    _this.musicEnded = _this.musicEnded.bind(_this);
+	    _this.nextMusic = _this.nextMusic.bind(_this);
+	    _this.prevMusic = _this.prevMusic.bind(_this);
+	    _this.randomMusic = _this.randomMusic.bind(_this);
+	    _this.repeatMusic = _this.repeatMusic.bind(_this);
 
 	    // initialState
 	    _this.initialState = _this.state;
@@ -21642,6 +21646,22 @@
 	  }
 
 	  _createClass(App, [{
+	    key: 'useMic',
+	    value: function useMic() {
+	      var _this2 = this;
+
+	      navigator.getUserMedia({ audio: true }, function (stream) {
+	        var audioContext = _this2.acMic,
+	            analyser = _this2.anMic,
+	            microphone = audioContext.createMediaStreamSource(stream);
+
+	        microphone.connect(analyser);
+	        analyser.connect(audioContext.destination);
+	      }, function (error) {
+	        console.log(error);
+	      });
+	    }
+	  }, {
 	    key: 'visualizing',
 	    value: function visualizing() {
 	      var frequencyData = this.frequencyData,
@@ -21669,28 +21689,12 @@
 	      analyser.connect(audioContext.destination);
 	    }
 	  }, {
-	    key: 'useMic',
-	    value: function useMic() {
-	      var _this2 = this;
-
-	      navigator.getUserMedia({ audio: true }, function (stream) {
-	        var audioContext = _this2.acMic,
-	            analyser = _this2.anMic,
-	            microphone = audioContext.createMediaStreamSource(stream);
-
-	        microphone.connect(analyser);
-	        analyser.connect(audioContext.destination);
-	      }, function (error) {
-	        console.log(error);
-	      });
-	    }
-	  }, {
 	    key: 'fileChange',
 	    value: function fileChange(e) {
 	      var _this3 = this;
 
 	      var files = e.target.files,
-	          playlist = this.state.playlist;
+	          playlist = this.state.playlist.data;
 
 	      var _loop = function _loop(i) {
 	        var file = files[i],
@@ -21733,8 +21737,15 @@
 	            // when finished
 	            if (i == files.length - 1) whenFinished();
 	          },
+	          // if do not have ID3 tags
 	          onError: function onError(error) {
-	            (0, _Toast.Toast)('Failed to read file', 'default');
+	            music.audioData = {
+	              src: dataFile
+	            };
+	            playlist.push(music);
+
+	            // when finished
+	            if (i == files.length - 1) whenFinished();
 	          }
 	        });
 	      };
@@ -21747,9 +21758,13 @@
 	      var whenFinished = function whenFinished() {
 	        if (files.length > 0) (0, _Toast.Toast)(files.length + ' songs have been added to the playlist', 'default');
 
-	        _this3.setState({ playlist: playlist });
+	        _this3.setState({
+	          playlist: (0, _reactAddonsUpdate2.default)(_this3.state.playlist, {
+	            data: { $set: playlist }
+	          })
+	        });
 
-	        if (!_this3.state.audioData.src) _this3.changeState_audioData(playlist[_this3.state.currentPlay].audioData);
+	        if (!_this3.state.audioData.src) _this3.changeState_audioData(playlist[_this3.state.playlist.currentPlay].audioData);
 	      };
 	    }
 	  }, {
@@ -21792,26 +21807,18 @@
 	          cover: { $set: obj.cover }
 	        })
 	      }, function () {
-	        _this5.setState({ lyrics: [], showLyrics: false, scroll: 0.5 });
+	        // reset lyrics State
+	        _this5.setState({
+	          lyrics: (0, _reactAddonsUpdate2.default)(_this5.state.lyrics, {
+	            data: { $set: [] },
+	            show: { $set: false },
+	            scroll: { $set: 0.5 }
+	          })
+	        });
 	        // find lyrics
 	        _this5.getLyrics(_this5.state.audioData.artist, _this5.state.audioData.title);
 	        // change Colors      
 	        _this5.changeState_colors(_this5.state.audioData.cover);
-	      });
-	    }
-	  }, {
-	    key: 'handleLyricsBtn',
-	    value: function handleLyricsBtn() {
-	      this.setState({ showLyrics: !this.state.showLyrics });
-	    }
-	  }, {
-	    key: 'colorReversal',
-	    value: function colorReversal() {
-	      this.setState({
-	        colors: (0, _reactAddonsUpdate2.default)(this.state.colors, {
-	          main: { $set: this.state.colors.sub },
-	          sub: { $set: this.state.colors.main }
-	        })
 	      });
 	    }
 	    // when lyrics Component Mounted
@@ -21829,18 +21836,49 @@
 	      // e.deltaY > 0 ? Down : Up
 	      var deltaY = e.deltaY > 0 ? -3 : 3;
 
-	      if (this.state.scroll + deltaY <= -100 || this.state.scroll + deltaY >= 1) {
-	        this.setState({ scroll: this.state.scroll });
+	      if (this.state.lyrics.scroll + deltaY <= -100 || this.state.lyrics.scroll + deltaY >= 1) {
+	        this.setState({
+	          lyrics: (0, _reactAddonsUpdate2.default)(this.state.lyrics, {
+	            scroll: { $set: this.state.lyrics.scroll }
+	          })
+	        });
 	      } else {
-	        this.setState({ scroll: this.state.scroll + deltaY });
+	        this.setState({
+	          lyrics: (0, _reactAddonsUpdate2.default)(this.state.lyrics, {
+	            scroll: { $set: this.state.lyrics.scroll + deltaY }
+	          })
+	        });
 	      }
+	    }
+	  }, {
+	    key: 'handleLyricsBtn',
+	    value: function handleLyricsBtn() {
+	      this.setState({
+	        lyrics: (0, _reactAddonsUpdate2.default)(this.state.lyrics, {
+	          show: { $set: !this.state.lyrics.show }
+	        })
+	      });
+	    }
+	  }, {
+	    key: 'colorReversal',
+	    value: function colorReversal() {
+	      this.setState({
+	        colors: (0, _reactAddonsUpdate2.default)(this.state.colors, {
+	          main: { $set: this.state.colors.sub },
+	          sub: { $set: this.state.colors.main }
+	        })
+	      });
 	    }
 	    // show form
 
 	  }, {
-	    key: 'openFindLyrics',
-	    value: function openFindLyrics() {
-	      this.setState({ findLyrics: !this.state.findLyrics });
+	    key: 'handleFindLyricsBtn',
+	    value: function handleFindLyricsBtn() {
+	      this.setState({
+	        lyrics: (0, _reactAddonsUpdate2.default)(this.state.lyrics, {
+	          find: { $set: !this.state.lyrics.find }
+	        })
+	      });
 	    }
 	    // submit form
 
@@ -21862,36 +21900,89 @@
 	      var _this6 = this;
 
 	      // alert
-	      if (!this.state.showLyrics) (0, _Toast.Toast)('Only lyrics in English can be searched', 'default');
+	      if (!this.state.lyrics.data) (0, _Toast.Toast)('Only lyrics in English can be searched', 'default');
 	      _axios2.default.get('https://young-savannah-79010.herokuapp.com/lyrics/' + artist + '/' + title).then(function (response) {
 	        var data = response.data;
-	        _this6.setState({ lyrics: data ? data.split('\n') : _this6.state.lyrics });
 
-	        data ? (0, _Toast.Toast)('Lyrics Found!', 'success') : (0, _Toast.Toast)('Lyrics Not Found!', 'default');
-	        if (data) _this6.setState({ showLyrics: true, findLyrics: false });
+	        // update State
+	        _this6.setState({
+	          lyrics: (0, _reactAddonsUpdate2.default)(_this6.state.lyrics, {
+	            data: { $set: data ? data.split('\n') : _this6.state.lyrics.data }
+	          })
+	        });
+
+	        if (!data) {
+	          (0, _Toast.Toast)('Lyrics Not Found!', 'default');
+	        } else {
+	          (0, _Toast.Toast)('Lyrics Found!', 'success');
+	          // update State
+	          _this6.setState({
+	            lyrics: (0, _reactAddonsUpdate2.default)(_this6.state.lyrics, {
+	              show: { $set: true },
+	              find: { $set: false }
+	            })
+	          });
+	        }
 	      }).catch(function (error) {
 	        console.log(error);
 	      });
 	    }
 	  }, {
-	    key: 'showPlaylist',
-	    value: function showPlaylist() {
-	      this.setState({ showPlaylist: !this.state.showPlaylist });
+	    key: 'handlePlaylistBtn',
+	    value: function handlePlaylistBtn() {
+	      this.setState({
+	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
+	          show: { $set: !this.state.playlist.show }
+	        })
+	      });
+	    }
+	  }, {
+	    key: 'nextMusic',
+	    value: function nextMusic() {
+	      var currentNum = Number(this.state.playlist.currentPlay),
+	          num = currentNum + 1; // default 
+
+	      // random    
+	      if (this.state.playlist.random) num = Math.floor(Math.random() * this.state.playlist.data.length);
+	      // repeat
+	      if (this.state.playlist.repeat) num = currentNum;
+
+	      this.changeMusic(num);
+	    }
+	  }, {
+	    key: 'prevMusic',
+	    value: function prevMusic() {
+	      this.changeMusic(Number(this.state.playlist.currentPlay) - 1);
 	    }
 	  }, {
 	    key: 'changeMusic',
 	    value: function changeMusic(num) {
-	      if (num === this.state.playlist.length) num = 0;
-	      this.changeState_audioData(this.state.playlist[num].audioData);
-	      this.setState({ currentPlay: num });
+	      if (!this.state.playlist.data[num] || this.state.playlist.data.length === 1) return;
+
+	      this.changeState_audioData(this.state.playlist.data[num].audioData);
+	      this.setState({
+	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
+	          currentPlay: { $set: num }
+	        })
+	      });
 	    }
 	  }, {
-	    key: 'musicEnded',
-	    value: function musicEnded() {
-	      var musicIdx = Number(this.state.currentPlay);
-	      musicIdx += 1;
-	      // When there is more than one song
-	      if (this.state.playlist.length > 1) this.changeMusic(musicIdx);
+	    key: 'randomMusic',
+	    value: function randomMusic() {
+	      this.setState({
+	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
+	          random: { $set: !this.state.playlist.random }
+	        })
+	      });
+	    }
+	  }, {
+	    key: 'repeatMusic',
+	    value: function repeatMusic() {
+	      this.setState({
+	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
+	          repeat: { $set: !this.state.playlist.repeat }
+	        })
+	      });
 	    }
 	  }, {
 	    key: 'render',
@@ -21907,43 +21998,49 @@
 	        _react2.default.createElement(_Header2.default, null),
 	        _react2.default.createElement(_Controller2.default, {
 	          color: this.state.colors.sub,
-	          src: this.state.audioData.src,
 
-	          handlePlay: this.handlePlay,
 	          fileChange: this.fileChange,
 	          handleSubmit: this.findLyrics,
 
 	          handleLyricsBtn: this.handleLyricsBtn,
-	          handleFindLyricsBtn: this.openFindLyrics,
+	          handleFindLyricsBtn: this.handleFindLyricsBtn,
 	          handleReversalBtn: this.colorReversal,
 	          handleMicBtn: this.useMic,
 
-	          musicEnded: this.musicEnded,
-
-	          findLyrics: this.state.findLyrics,
-	          showLyrics: this.state.showLyrics
+	          findLyrics: this.state.lyrics.find,
+	          showLyrics: this.state.lyrics.show
 	        }),
 	        _react2.default.createElement(_Visualizer2.default, {
-	          'class': this.state.showLyrics ? 'visualizer showLyrics' : 'visualizer',
+	          'class': this.state.lyrics.show ? 'visualizer showLyrics' : 'visualizer',
 	          color: this.state.colors.sub,
 	          data: this.state.audioData,
 	          settings: this.state.visualizeSet,
 	          isMounted: this.visualizing
 	        }),
 	        _react2.default.createElement(_Lyrics2.default, {
-	          'class': this.state.showLyrics ? 'lyrics showLyrics' : 'lyrics',
+	          'class': this.state.lyrics.show ? 'lyrics showLyrics' : 'lyrics',
 	          color: this.state.colors.main,
-	          data: this.state.lyrics,
-	          scroll: this.state.scroll,
+	          data: this.state.lyrics.data,
+	          scroll: this.state.lyrics.scroll,
 	          lyricsMounted: this.lyricsMounted
 	        }),
 	        _react2.default.createElement(_Playlist2.default, {
-	          'class': this.state.showPlaylist ? 'playlist show' : 'playlist',
+	          'class': this.state.playlist.show ? 'playlist show' : 'playlist',
 	          color: this.state.colors,
-	          playlist: this.state.playlist,
+	          src: this.state.audioData.src,
+	          playlist: this.state.playlist.data,
+	          audioData: this.state.audioData,
+	          useRandom: this.state.playlist.random,
+	          useRepeat: this.state.playlist.repeat,
+
 	          changeMusic: this.changeMusic,
-	          handlePlaylistBtn: this.showPlaylist,
-	          audioData: this.state.audioData
+	          handlePlaylistBtn: this.handlePlaylistBtn,
+
+	          handlePlay: this.handlePlay,
+	          nextMusic: this.nextMusic,
+	          prevMusic: this.prevMusic,
+	          random: this.randomMusic,
+	          repeat: this.repeatMusic
 	        })
 	      );
 	    }
@@ -23704,10 +23801,15 @@
 	    _this.selectMusic = _this.selectMusic.bind(_this);
 	    return _this;
 	  }
-	  // open input[file]
-
 
 	  _createClass(Controller, [{
+	    key: 'shouldComponentUpdate',
+	    value: function shouldComponentUpdate(nextProps, nextState) {
+	      return nextProps !== this.props;
+	    }
+	    // open input[file]
+
+	  }, {
 	    key: 'selectMusic',
 	    value: function selectMusic() {
 	      var file = document.getElementById('audioFile');
@@ -23739,11 +23841,6 @@
 	            { style: btn, onClick: this.selectMusic },
 	            'Open file'
 	          ),
-	          _react2.default.createElement('audio', { crossOrigin: 'anonymous', controls: true, autoPlay: true,
-	            src: this.props.src,
-	            onEnded: this.props.musicEnded,
-	            onLoadedData: this.props.handlePlay
-	          }),
 	          _react2.default.createElement(
 	            'button',
 	            { style: btn, onClick: this.props.handleLyricsBtn },
@@ -23767,7 +23864,10 @@
 	        ),
 	        _react2.default.createElement(
 	          'form',
-	          { onSubmit: this.props.handleSubmit, className: this.props.findLyrics ? 'findLyrics show' : 'findLyrics' },
+	          {
+	            onSubmit: this.props.handleSubmit,
+	            className: this.props.findLyrics ? 'findLyrics show' : 'findLyrics'
+	          },
 	          _react2.default.createElement('input', { type: 'text', name: 'artist', placeholder: 'artist', required: true }),
 	          _react2.default.createElement('input', { type: 'text', name: 'title', placeholder: 'title', required: true }),
 	          _react2.default.createElement(
@@ -23822,46 +23922,6 @@
 
 /***/ },
 /* 209 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var NowPlaying = function NowPlaying(props) {
-	  return _react2.default.createElement(
-	    "div",
-	    { className: "nowPlaying" },
-	    _react2.default.createElement(
-	      "h3",
-	      { className: "nowPlaying__artist" },
-	      props.data.artist
-	    ),
-	    _react2.default.createElement(
-	      "h3",
-	      { className: "nowPlaying__title" },
-	      props.data.title
-	    ),
-	    _react2.default.createElement(
-	      "h3",
-	      { className: "nowPlaying__album" },
-	      props.data.album
-	    )
-	  );
-	};
-
-	exports.default = NowPlaying;
-
-/***/ },
-/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23939,10 +23999,10 @@
 	exports.default = Lyrics;
 
 /***/ },
-/* 211 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -23953,6 +24013,18 @@
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
+
+	var _NowPlaying = __webpack_require__(211);
+
+	var _NowPlaying2 = _interopRequireDefault(_NowPlaying);
+
+	var _Control = __webpack_require__(212);
+
+	var _Control2 = _interopRequireDefault(_Control);
+
+	var _listitem = __webpack_require__(213);
+
+	var _listitem2 = _interopRequireDefault(_listitem);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23970,48 +24042,125 @@
 
 	    var _this = _possibleConstructorReturn(this, (Playlist.__proto__ || Object.getPrototypeOf(Playlist)).call(this, props));
 
-	    _this.handleClick = _this.handleClick.bind(_this);
+	    _this.state = {
+	      playing: false,
+	      duration: 0,
+	      currentTime: 0
+	    };
 	    return _this;
 	  }
 
 	  _createClass(Playlist, [{
-	    key: "handleClick",
-	    value: function handleClick(e) {
-	      this.props.changeMusic(e.target.dataset.num);
+	    key: 'componentWillUpdate',
+	    value: function componentWillUpdate(nextProps, nextState) {
+	      var audio = document.getElementById('audio');
+	      if (audio.duration > 0) {
+	        nextState.playing ? audio.play() : audio.pause();
+	      }
 	    }
 	  }, {
-	    key: "render",
-	    value: function render() {
+	    key: 'itemClick',
+	    value: function itemClick(num, obj) {
+	      this.props.changeMusic(num);
+	    }
+	  }, {
+	    key: 'musicPlayControl',
+	    value: function musicPlayControl() {
+	      this.setState({ playing: !this.state.playing });
+	    }
+	  }, {
+	    key: 'onTimeUpdate',
+	    value: function onTimeUpdate(e) {
+	      this.setState({
+	        duration: audio.duration,
+	        currentTime: e.target.currentTime
+	      });
+	    }
+	  }, {
+	    key: 'progress',
+	    value: function progress(e) {
 	      var _this2 = this;
 
-	      var style = {
+	      var audio = document.getElementById('audio');
+
+	      var mouseX = e.clientX,
+	          progressX = e.target.getBoundingClientRect().left,
+	          progressWidth = e.target.offsetWidth,
+	          progress = e.target.offsetWidth / (mouseX - progressX),
+	          currentTime = this.state.duration / progress;
+
+	      this.setState({
+	        currentTime: currentTime
+	      }, function () {
+	        audio.currentTime = _this2.state.currentTime;
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this3 = this;
+
+	      var invisible = {
+	        position: 'absolute',
+	        width: 0,
+	        height: 0,
+	        opacity: 0
+	      };
+	      var progress = {
 	        backgroundColor: this.props.color.sub,
-	        color: this.props.color.main
+	        width: Math.round(this.state.currentTime / this.state.duration * 100) + '%'
 	      };
 	      return _react2.default.createElement(
-	        "div",
+	        'div',
 	        { className: this.props.class },
-	        _react2.default.createElement("div", { className: "backdrop", onClick: this.props.handlePlaylistBtn }),
-	        _react2.default.createElement(NowPlaying, { onClick: this.props.handlePlaylistBtn,
-	          "class": "nowPlaying",
-	          data: this.props.audioData
+	        _react2.default.createElement('div', {
+	          className: 'backdrop',
+	          onClick: this.props.handlePlaylistBtn }),
+	        _react2.default.createElement(_NowPlaying2.default, {
+	          'class': 'nowPlaying',
+	          data: this.props.audioData,
+	          onClick: this.props.handlePlaylistBtn
+	        }),
+	        _react2.default.createElement('audio', { id: 'audio', crossOrigin: 'anonymous', controls: true,
+	          style: invisible,
+	          src: this.props.src,
+	          onEnded: this.props.nextMusic,
+	          onTimeUpdate: this.onTimeUpdate.bind(this),
+	          onLoadedData: this.props.handlePlay
+	        }),
+	        _react2.default.createElement(_Control2.default, {
+	          'class': 'playlistControl',
+	          playing: this.state.playing,
+	          color: this.props.color.sub,
+	          random: this.props.random,
+	          repeat: this.props.repeat,
+	          useRandom: this.props.useRandom,
+	          useRepeat: this.props.useRepeat,
+	          nextMusic: this.props.nextMusic,
+	          prevMusic: this.props.prevMusic,
+	          musicPlayControl: this.musicPlayControl.bind(this)
 	        }),
 	        _react2.default.createElement(
-	          "div",
-	          { className: "playlist__item-wrapper" },
+	          'div',
+	          { className: 'playlist__progress', onClick: this.progress.bind(this) },
+	          _react2.default.createElement('div', { style: progress })
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'playlist__item-wrapper' },
 	          this.props.playlist.map(function (data, i) {
 	            var style = {
-	              transitionDelay: i < 15 ? i / 13 + 's' : '0s'
+	              transitionDelay: i < 10 ? i / 13 + 's' : '0s'
 	            };
-	            return _react2.default.createElement(Item, {
-	              key: i, num: i,
-	              "class": "playlist__item",
+	            return _react2.default.createElement(_listitem2.default, {
+	              key: i,
+	              'class': 'playlist__item',
+	              css: style,
 	              album: data.audioData.album,
 	              title: data.audioData.title,
 	              artist: data.audioData.artist,
 	              cover: data.audioData.cover,
-	              css: style,
-	              onClick: _this2.handleClick
+	              onClick: _this3.itemClick.bind(_this3, i)
 	            });
 	          })
 	        )
@@ -24022,57 +24171,44 @@
 	  return Playlist;
 	}(_react.Component);
 
-	var Item = function Item(props) {
-	  return _react2.default.createElement(
-	    "div",
-	    {
-	      onClick: props.onClick,
-	      style: props.css,
-	      className: props.class,
-	      "data-num": props.num },
-	    _react2.default.createElement("img", { className: props.class + '-cover', src: props.cover }),
-	    _react2.default.createElement(
-	      "div",
-	      { className: props.class + '-infoBox' },
-	      _react2.default.createElement(
-	        "span",
-	        { className: props.class + '-title' },
-	        props.title
-	      ),
-	      _react2.default.createElement(
-	        "span",
-	        { className: props.class + '-artist' },
-	        props.artist
-	      ),
-	      _react2.default.createElement(
-	        "span",
-	        { className: props.class + '-album' },
-	        props.album
-	      )
-	    )
-	  );
-	};
+	exports.default = Playlist;
+
+/***/ },
+/* 211 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var NowPlaying = function NowPlaying(props) {
 	  return _react2.default.createElement(
-	    "div",
+	    'div',
 	    { className: props.class, onClick: props.onClick },
-	    _react2.default.createElement("img", { className: props.class + '-cover', src: props.data.cover }),
+	    _react2.default.createElement('img', { className: props.class + '-cover', src: props.data.cover }),
 	    _react2.default.createElement(
-	      "div",
+	      'div',
 	      { className: props.class + '-infoBox' },
 	      _react2.default.createElement(
-	        "span",
+	        'span',
 	        { className: props.class + '-title' },
 	        props.data.title
 	      ),
 	      _react2.default.createElement(
-	        "span",
+	        'span',
 	        { className: props.class + '-artist' },
 	        props.data.artist
 	      ),
 	      _react2.default.createElement(
-	        "span",
+	        'span',
 	        { className: props.class + '-album' },
 	        props.data.album
 	      )
@@ -24080,23 +24216,128 @@
 	  );
 	};
 
-	exports.default = Playlist;
+	exports.default = NowPlaying;
 
 /***/ },
 /* 212 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Control = function Control(props) {
+	  var color = {
+	    color: props.color
+	  };
+	  return _react2.default.createElement(
+	    'div',
+	    { className: props.class },
+	    _react2.default.createElement(
+	      'button',
+	      { style: color, onClick: props.prevMusic },
+	      _react2.default.createElement('i', { className: 'step backward icon' })
+	    ),
+	    _react2.default.createElement(
+	      'button',
+	      { style: color, onClick: props.musicPlayControl },
+	      props.playing ? _react2.default.createElement('i', { className: 'pause icon' }) : _react2.default.createElement('i', { className: 'play icon' })
+	    ),
+	    _react2.default.createElement(
+	      'button',
+	      { style: color, onClick: props.nextMusic },
+	      _react2.default.createElement('i', { className: 'step forward icon' })
+	    ),
+	    _react2.default.createElement(
+	      'button',
+	      { style: color,
+	        className: props.useRandom ? 'active' : '',
+	        onClick: props.random },
+	      _react2.default.createElement('i', { className: 'random icon' })
+	    ),
+	    _react2.default.createElement(
+	      'button',
+	      { style: color,
+	        className: props.useRepeat ? 'active' : '',
+	        onClick: props.repeat },
+	      _react2.default.createElement('i', { className: 'repeat icon' })
+	    )
+	  );
+	};
+
+	exports.default = Control;
+
+/***/ },
+/* 213 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Item = function Item(props) {
+	  return _react2.default.createElement(
+	    'div',
+	    {
+	      onClick: props.onClick,
+	      style: props.css,
+	      className: props.class },
+	    _react2.default.createElement('img', { className: props.class + '-cover', src: props.cover }),
+	    _react2.default.createElement(
+	      'div',
+	      { className: props.class + '-infoBox' },
+	      _react2.default.createElement(
+	        'span',
+	        { className: props.class + '-title' },
+	        props.title
+	      ),
+	      _react2.default.createElement(
+	        'span',
+	        { className: props.class + '-artist' },
+	        props.artist
+	      ),
+	      _react2.default.createElement(
+	        'span',
+	        { className: props.class + '-album' },
+	        props.album
+	      )
+	    )
+	  );
+	};
+
+	exports.default = Item;
+
+/***/ },
+/* 214 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
-	const MediaFileReader = __webpack_require__(213);
-	const NodeFileReader = __webpack_require__(215);
-	const XhrFileReader = __webpack_require__(222);
-	const BlobFileReader = __webpack_require__(224);
-	const ArrayFileReader = __webpack_require__(225);
-	const MediaTagReader = __webpack_require__(226);
-	const ID3v1TagReader = __webpack_require__(227);
-	const ID3v2TagReader = __webpack_require__(228);
-	const MP4TagReader = __webpack_require__(230);
+	const MediaFileReader = __webpack_require__(215);
+	const NodeFileReader = __webpack_require__(217);
+	const XhrFileReader = __webpack_require__(224);
+	const BlobFileReader = __webpack_require__(226);
+	const ArrayFileReader = __webpack_require__(227);
+	const MediaTagReader = __webpack_require__(228);
+	const ID3v1TagReader = __webpack_require__(229);
+	const ID3v2TagReader = __webpack_require__(230);
+	const MP4TagReader = __webpack_require__(232);
 
 	var mediaFileReaders = [];
 	var mediaTagReaders = [];
@@ -24337,12 +24578,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 213 */
+/* 215 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const StringUtils = __webpack_require__(214);
+	const StringUtils = __webpack_require__(216);
 
 	class MediaFileReader {
 
@@ -24539,7 +24780,7 @@
 	module.exports = MediaFileReader;
 
 /***/ },
-/* 214 */
+/* 216 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24648,15 +24889,15 @@
 	module.exports = StringUtils;
 
 /***/ },
-/* 215 */
+/* 217 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process, Buffer) {'use strict';
 
-	const fs = __webpack_require__(220);
+	const fs = __webpack_require__(222);
 
-	const ChunkedFileData = __webpack_require__(221);
-	const MediaFileReader = __webpack_require__(213);
+	const ChunkedFileData = __webpack_require__(223);
+	const MediaFileReader = __webpack_require__(215);
 
 	class NodeFileReader extends MediaFileReader {
 
@@ -24742,10 +24983,10 @@
 	}
 
 	module.exports = NodeFileReader;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(216).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(218).Buffer))
 
 /***/ },
-/* 216 */
+/* 218 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -24758,9 +24999,9 @@
 
 	'use strict'
 
-	var base64 = __webpack_require__(217)
-	var ieee754 = __webpack_require__(218)
-	var isArray = __webpack_require__(219)
+	var base64 = __webpack_require__(219)
+	var ieee754 = __webpack_require__(220)
+	var isArray = __webpack_require__(221)
 
 	exports.Buffer = Buffer
 	exports.SlowBuffer = SlowBuffer
@@ -26541,7 +26782,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 217 */
+/* 219 */
 /***/ function(module, exports) {
 
 	'use strict'
@@ -26661,7 +26902,7 @@
 
 
 /***/ },
-/* 218 */
+/* 220 */
 /***/ function(module, exports) {
 
 	exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -26751,7 +26992,7 @@
 
 
 /***/ },
-/* 219 */
+/* 221 */
 /***/ function(module, exports) {
 
 	var toString = {}.toString;
@@ -26762,13 +27003,13 @@
 
 
 /***/ },
-/* 220 */
+/* 222 */
 /***/ function(module, exports) {
 
 	
 
 /***/ },
-/* 221 */
+/* 223 */
 /***/ function(module, exports) {
 
 	/**
@@ -26967,13 +27208,13 @@
 	module.exports = ChunkedFileData;
 
 /***/ },
-/* 222 */
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const ChunkedFileData = __webpack_require__(221);
-	const MediaFileReader = __webpack_require__(213);
+	const ChunkedFileData = __webpack_require__(223);
+	const MediaFileReader = __webpack_require__(215);
 
 	const CHUNK_SIZE = 1024;
 
@@ -27235,7 +27476,7 @@
 	  _createXHRObject() {
 	    if (typeof window === "undefined") {
 	      // $FlowIssue - flow is not able to recognize this module.
-	      return new (__webpack_require__(223).XMLHttpRequest)();
+	      return new (__webpack_require__(225).XMLHttpRequest)();
 	    }
 
 	    if (window.XMLHttpRequest) {
@@ -27255,20 +27496,20 @@
 	module.exports = XhrFileReader;
 
 /***/ },
-/* 223 */
+/* 225 */
 /***/ function(module, exports) {
 
 	module.exports = XMLHttpRequest;
 
 
 /***/ },
-/* 224 */
+/* 226 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const ChunkedFileData = __webpack_require__(221);
-	const MediaFileReader = __webpack_require__(213);
+	const ChunkedFileData = __webpack_require__(223);
+	const MediaFileReader = __webpack_require__(215);
 
 	class BlobFileReader extends MediaFileReader {
 
@@ -27319,12 +27560,12 @@
 	module.exports = BlobFileReader;
 
 /***/ },
-/* 225 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 
-	var MediaFileReader = __webpack_require__(213);
+	var MediaFileReader = __webpack_require__(215);
 
 	class ArrayFileReader extends MediaFileReader {
 
@@ -27353,15 +27594,15 @@
 	}
 
 	module.exports = ArrayFileReader;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(216).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(218).Buffer))
 
 /***/ },
-/* 226 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	const MediaFileReader = __webpack_require__(213);
+	const MediaFileReader = __webpack_require__(215);
 
 	class MediaTagReader {
 
@@ -27458,13 +27699,13 @@
 	module.exports = MediaTagReader;
 
 /***/ },
-/* 227 */
+/* 229 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(226);
-	var MediaFileReader = __webpack_require__(213);
+	var MediaTagReader = __webpack_require__(228);
+	var MediaFileReader = __webpack_require__(215);
 
 	class ID3v1TagReader extends MediaTagReader {
 	  static getTagIdentifierByteRange() {
@@ -27540,15 +27781,15 @@
 	module.exports = ID3v1TagReader;
 
 /***/ },
-/* 228 */
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(226);
-	var MediaFileReader = __webpack_require__(213);
-	var ArrayFileReader = __webpack_require__(225);
-	var ID3v2FrameReader = __webpack_require__(229);
+	var MediaTagReader = __webpack_require__(228);
+	var MediaFileReader = __webpack_require__(215);
+	var ArrayFileReader = __webpack_require__(227);
+	var ID3v2FrameReader = __webpack_require__(231);
 
 	const ID3_HEADER_SIZE = 10;
 
@@ -27974,12 +28215,12 @@
 	module.exports = ID3v2TagReader;
 
 /***/ },
-/* 229 */
+/* 231 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var MediaFileReader = __webpack_require__(213);
+	var MediaFileReader = __webpack_require__(215);
 
 	var ID3v2FrameReader = {
 	  getFrameReaderFunction: function (frameId) {
@@ -28152,7 +28393,7 @@
 	module.exports = ID3v2FrameReader;
 
 /***/ },
-/* 230 */
+/* 232 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -28165,8 +28406,8 @@
 	 */
 	'use strict';
 
-	var MediaTagReader = __webpack_require__(226);
-	var MediaFileReader = __webpack_require__(213);
+	var MediaTagReader = __webpack_require__(228);
+	var MediaFileReader = __webpack_require__(215);
 
 	class MP4TagReader extends MediaTagReader {
 	  static getTagIdentifierByteRange() {
@@ -28448,7 +28689,7 @@
 	module.exports = MP4TagReader;
 
 /***/ },
-/* 231 */
+/* 233 */
 /***/ function(module, exports) {
 
 	/*!
@@ -29067,7 +29308,7 @@
 
 
 /***/ },
-/* 232 */
+/* 234 */
 /***/ function(module, exports) {
 
 	'use strict';
