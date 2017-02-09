@@ -21624,6 +21624,7 @@
 	    _this.prevMusic = _this.prevMusic.bind(_this);
 	    _this.randomMusic = _this.randomMusic.bind(_this);
 	    _this.repeatMusic = _this.repeatMusic.bind(_this);
+	    _this.deleteMusic = _this.deleteMusic.bind(_this);
 
 	    // initialState
 	    _this.initialState = _this.state;
@@ -21957,7 +21958,8 @@
 	  }, {
 	    key: 'changeMusic',
 	    value: function changeMusic(num) {
-	      if (!this.state.playlist.data[num] || this.state.playlist.data.length === 1) return;
+	      if (num === this.state.playlist.data.length) num = 0;
+	      if (!this.state.playlist.data[num]) return;
 
 	      this.changeState_audioData(this.state.playlist.data[num].audioData);
 	      this.setState({
@@ -21981,6 +21983,18 @@
 	      this.setState({
 	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
 	          repeat: { $set: !this.state.playlist.repeat }
+	        })
+	      });
+	    }
+	  }, {
+	    key: 'deleteMusic',
+	    value: function deleteMusic(num) {
+	      var currentPlay = this.state.playlist.currentPlay;
+
+	      this.setState({
+	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
+	          data: { $splice: [[num, 1]] },
+	          currentPlay: { $set: currentPlay > num ? currentPlay - 1 : currentPlay }
 	        })
 	      });
 	    }
@@ -22034,6 +22048,7 @@
 	          useRepeat: this.state.playlist.repeat,
 
 	          changeMusic: this.changeMusic,
+	          deleteMusic: this.deleteMusic,
 	          handlePlaylistBtn: this.handlePlaylistBtn,
 
 	          handlePlay: this.handlePlay,
@@ -24054,14 +24069,17 @@
 	    key: 'componentWillUpdate',
 	    value: function componentWillUpdate(nextProps, nextState) {
 	      var audio = document.getElementById('audio');
-	      if (audio.duration > 0) {
-	        nextState.playing ? audio.play() : audio.pause();
-	      }
+	      audio.duration > 0 && nextState.playing ? audio.play() : audio.pause();
 	    }
 	  }, {
 	    key: 'itemClick',
 	    value: function itemClick(num, obj) {
 	      this.props.changeMusic(num);
+	    }
+	  }, {
+	    key: 'deleteItem',
+	    value: function deleteItem(num, obj) {
+	      this.props.deleteMusic(num);
 	    }
 	  }, {
 	    key: 'musicPlayControl',
@@ -24160,7 +24178,8 @@
 	              title: data.audioData.title,
 	              artist: data.audioData.artist,
 	              cover: data.audioData.cover,
-	              onClick: _this3.itemClick.bind(_this3, i)
+	              onClick: _this3.itemClick.bind(_this3, i),
+	              deleteItem: _this3.deleteItem.bind(_this3, i)
 	            });
 	          })
 	        )
@@ -24301,28 +24320,36 @@
 	  return _react2.default.createElement(
 	    'div',
 	    {
-	      onClick: props.onClick,
 	      style: props.css,
 	      className: props.class },
-	    _react2.default.createElement('img', { className: props.class + '-cover', src: props.cover }),
 	    _react2.default.createElement(
 	      'div',
-	      { className: props.class + '-infoBox' },
+	      { onClick: props.onClick },
+	      _react2.default.createElement('img', { className: props.class + '-cover', src: props.cover }),
 	      _react2.default.createElement(
-	        'span',
-	        { className: props.class + '-title' },
-	        props.title
-	      ),
-	      _react2.default.createElement(
-	        'span',
-	        { className: props.class + '-artist' },
-	        props.artist
-	      ),
-	      _react2.default.createElement(
-	        'span',
-	        { className: props.class + '-album' },
-	        props.album
+	        'div',
+	        { className: props.class + '-infoBox' },
+	        _react2.default.createElement(
+	          'span',
+	          { className: props.class + '-title' },
+	          props.title
+	        ),
+	        _react2.default.createElement(
+	          'span',
+	          { className: props.class + '-artist' },
+	          props.artist
+	        ),
+	        _react2.default.createElement(
+	          'span',
+	          { className: props.class + '-album' },
+	          props.album
+	        )
 	      )
+	    ),
+	    _react2.default.createElement(
+	      'button',
+	      { onClick: props.deleteItem },
+	      _react2.default.createElement('i', { className: 'minus circle icon' })
 	    )
 	  );
 	};
