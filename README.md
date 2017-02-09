@@ -3,7 +3,7 @@
 ![v1.5](images/v1.5.png)
 ![v1.5_playlist](images/v1.5_playlist.png)
 
-##Current Version - 1.5
+##Current Version - 1.5 [ChangeLog](ChangeLog.md)
 (Demo) - [https://gomonk3037.github.io/Visualizer/](https://gomonk3037.github.io/Visualizer/)
 
 ## About
