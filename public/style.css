@@ -197,6 +197,7 @@ body{
 
 .playlist__item{
 	display: flex;
+	justify-content: space-between;
 	margin-bottom: 0.7rem;
 	opacity: 0;
 	transform: translateX(10rem);
@@ -206,9 +207,31 @@ body{
 	background-color:rgba(255, 255,255, 0.1);
 }
 
-.playlist__item *{
+.playlist__item:hover > button{
+	opacity: 1;
+	transform: scale(1);
+}
+
+.playlist__item > button{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	color: white;
+	font-size: 2rem;
+	opacity: 0;
+	transform: scale(0);
+	transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.playlist__item > div {
+	display: flex;
+	width: 100%;
+}
+
+.playlist__item > div *{
 	pointer-events: none;
 }
+
 .playlist.show .playlist__item{
 	opacity: 1;
 	transform: translateX(0);

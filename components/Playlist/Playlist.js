@@ -14,12 +14,13 @@ class Playlist extends Component {
   }
   componentWillUpdate(nextProps, nextState) {
     const audio = document.getElementById('audio');
-    if (audio.duration > 0) {
-      nextState.playing ? audio.play() : audio.pause();
-    }
+    audio.duration > 0 && nextState.playing ? audio.play() : audio.pause();
   }
   itemClick(num, obj) {
     this.props.changeMusic(num);
+  }
+  deleteItem(num, obj) {
+    this.props.deleteMusic(num);
   }
   musicPlayControl() {
     this.setState({ playing: !this.state.playing });
@@ -104,6 +105,7 @@ class Playlist extends Component {
                 artist={data.audioData.artist}
                 cover={data.audioData.cover}
                 onClick={this.itemClick.bind(this, i)}
+                deleteItem={this.deleteItem.bind(this, i)}
               />
             )
           })}

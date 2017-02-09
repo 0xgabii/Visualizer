@@ -67,6 +67,7 @@ class App extends Component {
     this.prevMusic = this.prevMusic.bind(this);
     this.randomMusic = this.randomMusic.bind(this);
     this.repeatMusic = this.repeatMusic.bind(this);
+    this.deleteMusic = this.deleteMusic.bind(this);
 
     // initialState
     this.initialState = this.state;
@@ -367,7 +368,8 @@ class App extends Component {
     this.changeMusic(Number(this.state.playlist.currentPlay) - 1);
   }
   changeMusic(num) {
-    if (!this.state.playlist.data[num] || this.state.playlist.data.length === 1) return;
+    if (num === this.state.playlist.data.length) num = 0;
+    if (!this.state.playlist.data[num]) return;
 
     this.changeState_audioData(this.state.playlist.data[num].audioData);
     this.setState({
@@ -395,6 +397,18 @@ class App extends Component {
         }
       )
     })
+  }
+  deleteMusic(num) {
+    let currentPlay = this.state.playlist.currentPlay;
+
+    this.setState({
+      playlist: update(
+        this.state.playlist, {
+          data: { $splice: [[num, 1]] },
+          currentPlay: { $set: currentPlay > num ? currentPlay - 1 : currentPlay }
+        }
+      )
+    });
   }
   render() {
     const styles = {
@@ -443,6 +457,7 @@ class App extends Component {
           useRepeat={this.state.playlist.repeat}
 
           changeMusic={this.changeMusic}
+          deleteMusic={this.deleteMusic}
           handlePlaylistBtn={this.handlePlaylistBtn}
 
           handlePlay={this.handlePlay}
