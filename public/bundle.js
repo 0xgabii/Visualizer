@@ -21994,7 +21994,7 @@
 	      this.setState({
 	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
 	          data: { $splice: [[num, 1]] },
-	          currentPlay: { $set: currentPlay > num ? currentPlay - 1 : currentPlay }
+	          currentPlay: { $set: currentPlay >= num ? currentPlay - 1 : currentPlay }
 	        })
 	      });
 	    }
