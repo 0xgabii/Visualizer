@@ -21602,6 +21602,7 @@
 	      playlist: {
 	        data: [],
 	        currentPlay: 0,
+	        show: false,
 	        random: false,
 	        repeat: false
 	      }
@@ -21618,6 +21619,8 @@
 	    _this.wheelEvent = _this.wheelEvent.bind(_this);
 	    _this.changeState_colors = _this.changeState_colors.bind(_this);
 	    _this.changeState_audioData = _this.changeState_audioData.bind(_this);
+	    _this.changeState_Lyrics = _this.changeState_Lyrics.bind(_this);
+	    _this.changeState_Playlist = _this.changeState_Playlist.bind(_this);
 	    _this.handlePlaylistBtn = _this.handlePlaylistBtn.bind(_this);
 	    _this.changeMusic = _this.changeMusic.bind(_this);
 	    _this.nextMusic = _this.nextMusic.bind(_this);
@@ -21822,6 +21825,27 @@
 	        _this5.changeState_colors(_this5.state.audioData.cover);
 	      });
 	    }
+	  }, {
+	    key: 'changeState_Lyrics',
+	    value: function changeState_Lyrics(_ref) {
+	      var _ref$data = _ref.data,
+	          data = _ref$data === undefined ? this.state.lyrics.data : _ref$data,
+	          _ref$scroll = _ref.scroll,
+	          scroll = _ref$scroll === undefined ? this.state.lyrics.scroll : _ref$scroll,
+	          _ref$show = _ref.show,
+	          show = _ref$show === undefined ? this.state.lyrics.show : _ref$show,
+	          _ref$find = _ref.find,
+	          find = _ref$find === undefined ? this.state.lyrics.find : _ref$find;
+
+	      this.setState({
+	        lyrics: (0, _reactAddonsUpdate2.default)(this.state.lyrics, {
+	          data: { $set: data },
+	          scroll: { $set: scroll },
+	          show: { $set: show },
+	          find: { $set: find }
+	        })
+	      });
+	    }
 	    // when lyrics Component Mounted
 
 	  }, {
@@ -21835,30 +21859,15 @@
 	    key: 'wheelEvent',
 	    value: function wheelEvent(e) {
 	      // e.deltaY > 0 ? Down : Up
-	      var deltaY = e.deltaY > 0 ? -3 : 3;
+	      var deltaY = e.deltaY > 0 ? -3 : 3,
+	          currentScroll = this.state.lyrics.scroll;
 
-	      if (this.state.lyrics.scroll + deltaY <= -100 || this.state.lyrics.scroll + deltaY >= 1) {
-	        this.setState({
-	          lyrics: (0, _reactAddonsUpdate2.default)(this.state.lyrics, {
-	            scroll: { $set: this.state.lyrics.scroll }
-	          })
-	        });
-	      } else {
-	        this.setState({
-	          lyrics: (0, _reactAddonsUpdate2.default)(this.state.lyrics, {
-	            scroll: { $set: this.state.lyrics.scroll + deltaY }
-	          })
-	        });
-	      }
+	      if (currentScroll + deltaY <= -100 || currentScroll + deltaY >= 1) this.changeState_Lyrics({ scroll: currentScroll });else this.changeState_Lyrics({ scroll: currentScroll + deltaY });
 	    }
 	  }, {
 	    key: 'handleLyricsBtn',
 	    value: function handleLyricsBtn() {
-	      this.setState({
-	        lyrics: (0, _reactAddonsUpdate2.default)(this.state.lyrics, {
-	          show: { $set: !this.state.lyrics.show }
-	        })
-	      });
+	      this.changeState_Lyrics({ show: !this.state.lyrics.show });
 	    }
 	  }, {
 	    key: 'colorReversal',
@@ -21875,11 +21884,7 @@
 	  }, {
 	    key: 'handleFindLyricsBtn',
 	    value: function handleFindLyricsBtn() {
-	      this.setState({
-	        lyrics: (0, _reactAddonsUpdate2.default)(this.state.lyrics, {
-	          find: { $set: !this.state.lyrics.find }
-	        })
-	      });
+	      this.changeState_Lyrics({ find: !this.state.lyrics.find });
 	    }
 	    // submit form
 
@@ -21906,22 +21911,16 @@
 	        var data = response.data;
 
 	        // update State
-	        _this6.setState({
-	          lyrics: (0, _reactAddonsUpdate2.default)(_this6.state.lyrics, {
-	            data: { $set: data ? data.split('\n') : _this6.state.lyrics.data }
-	          })
-	        });
+	        _this6.changeState_Lyrics({ data: data ? data.split('\n') : _this6.state.lyrics.data });
 
 	        if (!data) {
 	          (0, _Toast.Toast)('Lyrics Not Found!', 'default');
 	        } else {
 	          (0, _Toast.Toast)('Lyrics Found!', 'success');
 	          // update State
-	          _this6.setState({
-	            lyrics: (0, _reactAddonsUpdate2.default)(_this6.state.lyrics, {
-	              show: { $set: true },
-	              find: { $set: false }
-	            })
+	          _this6.changeState_Lyrics({
+	            show: true,
+	            find: false
 	          });
 	        }
 	      }).catch(function (error) {
@@ -21929,13 +21928,33 @@
 	      });
 	    }
 	  }, {
-	    key: 'handlePlaylistBtn',
-	    value: function handlePlaylistBtn() {
+	    key: 'changeState_Playlist',
+	    value: function changeState_Playlist(_ref2) {
+	      var _ref2$data = _ref2.data,
+	          data = _ref2$data === undefined ? this.state.playlist.data : _ref2$data,
+	          _ref2$currentPlay = _ref2.currentPlay,
+	          currentPlay = _ref2$currentPlay === undefined ? this.state.playlist.currentPlay : _ref2$currentPlay,
+	          _ref2$show = _ref2.show,
+	          show = _ref2$show === undefined ? this.state.playlist.show : _ref2$show,
+	          _ref2$random = _ref2.random,
+	          random = _ref2$random === undefined ? this.state.playlist.random : _ref2$random,
+	          _ref2$repeat = _ref2.repeat,
+	          repeat = _ref2$repeat === undefined ? this.state.playlist.repeat : _ref2$repeat;
+
 	      this.setState({
 	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
-	          show: { $set: !this.state.playlist.show }
+	          data: { $set: data },
+	          currentPlay: { $set: currentPlay },
+	          show: { $set: show },
+	          random: { $set: random },
+	          repeat: { $set: repeat }
 	        })
 	      });
+	    }
+	  }, {
+	    key: 'handlePlaylistBtn',
+	    value: function handlePlaylistBtn() {
+	      this.changeState_Playlist({ show: !this.state.playlist.show });
 	    }
 	  }, {
 	    key: 'nextMusic',
@@ -21962,29 +21981,17 @@
 	      if (!this.state.playlist.data[num]) return;
 
 	      this.changeState_audioData(this.state.playlist.data[num].audioData);
-	      this.setState({
-	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
-	          currentPlay: { $set: num }
-	        })
-	      });
+	      this.changeState_Playlist({ currentPlay: num });
 	    }
 	  }, {
 	    key: 'randomMusic',
 	    value: function randomMusic() {
-	      this.setState({
-	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
-	          random: { $set: !this.state.playlist.random }
-	        })
-	      });
+	      this.changeState_Playlist({ random: !this.state.playlist.random });
 	    }
 	  }, {
 	    key: 'repeatMusic',
 	    value: function repeatMusic() {
-	      this.setState({
-	        playlist: (0, _reactAddonsUpdate2.default)(this.state.playlist, {
-	          repeat: { $set: !this.state.playlist.repeat }
-	        })
-	      });
+	      this.changeState_Playlist({ repeat: !this.state.playlist.repeat });
 	    }
 	  }, {
 	    key: 'deleteMusic',
