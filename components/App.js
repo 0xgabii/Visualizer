@@ -45,6 +45,7 @@ class App extends Component {
       playlist: {
         data: [],
         currentPlay: 0,
+        show: false,
         random: false,
         repeat: false
       }
@@ -61,6 +62,8 @@ class App extends Component {
     this.wheelEvent = this.wheelEvent.bind(this);
     this.changeState_colors = this.changeState_colors.bind(this);
     this.changeState_audioData = this.changeState_audioData.bind(this);
+    this.changeState_Lyrics = this.changeState_Lyrics.bind(this);
+    this.changeState_Playlist = this.changeState_Playlist.bind(this);
     this.handlePlaylistBtn = this.handlePlaylistBtn.bind(this);
     this.changeMusic = this.changeMusic.bind(this);
     this.nextMusic = this.nextMusic.bind(this);
@@ -243,6 +246,23 @@ class App extends Component {
       this.changeState_colors(this.state.audioData.cover);
     });
   }
+  changeState_Lyrics({
+    data = this.state.lyrics.data,
+    scroll = this.state.lyrics.scroll,
+    show = this.state.lyrics.show,
+    find = this.state.lyrics.find
+  }) {
+    this.setState({
+      lyrics: update(
+        this.state.lyrics, {
+          data: { $set: data },
+          scroll: { $set: scroll },
+          show: { $set: show },
+          find: { $set: find },
+        }
+      )
+    });
+  }
   // when lyrics Component Mounted
   lyricsMounted() {
     const lyrics = document.querySelector('.lyrics');
@@ -251,34 +271,16 @@ class App extends Component {
   }
   wheelEvent(e) {
     // e.deltaY > 0 ? Down : Up
-    let deltaY = e.deltaY > 0 ? -3 : 3;
+    let deltaY = e.deltaY > 0 ? -3 : 3,
+      currentScroll = this.state.lyrics.scroll;
 
-    if (this.state.lyrics.scroll + deltaY <= -100 || this.state.lyrics.scroll + deltaY >= 1) {
-      this.setState({
-        lyrics: update(
-          this.state.lyrics, {
-            scroll: { $set: this.state.lyrics.scroll }
-          }
-        )
-      });
-    } else {
-      this.setState({
-        lyrics: update(
-          this.state.lyrics, {
-            scroll: { $set: this.state.lyrics.scroll + deltaY }
-          }
-        )
-      });
-    }
+    if (currentScroll + deltaY <= -100 || currentScroll + deltaY >= 1)
+      this.changeState_Lyrics({ scroll: currentScroll });
+    else
+      this.changeState_Lyrics({ scroll: currentScroll + deltaY });
   }
   handleLyricsBtn() {
-    this.setState({
-      lyrics: update(
-        this.state.lyrics, {
-          show: { $set: !this.state.lyrics.show }
-        }
-      )
-    });
+    this.changeState_Lyrics({ show: !this.state.lyrics.show });
   }
   colorReversal() {
     this.setState({
@@ -292,13 +294,7 @@ class App extends Component {
   }
   // show form
   handleFindLyricsBtn() {
-    this.setState({
-      lyrics: update(
-        this.state.lyrics, {
-          find: { $set: !this.state.lyrics.find }
-        }
-      )
-    });
+    this.changeState_Lyrics({ find: !this.state.lyrics.find });
   }
   // submit form
   findLyrics(e) {
@@ -318,38 +314,41 @@ class App extends Component {
         let data = response.data;
 
         // update State
-        this.setState({
-          lyrics: update(
-            this.state.lyrics, {
-              data: { $set: data ? data.split('\n') : this.state.lyrics.data }
-            }
-          )
-        });
+        this.changeState_Lyrics({ data: data ? data.split('\n') : this.state.lyrics.data });
 
         if (!data) {
           Toast('Lyrics Not Found!', 'default');
         } else {
           Toast('Lyrics Found!', 'success');
           // update State
-          this.setState({
-            lyrics: update(
-              this.state.lyrics, {
-                show: { $set: true },
-                find: { $set: false }
-              }
-            )
+          this.changeState_Lyrics({
+            show: true,
+            find: false
           });
         }
       }).catch((error) => { console.log(error); });
   }
-  handlePlaylistBtn() {
+  changeState_Playlist({
+    data = this.state.playlist.data,
+    currentPlay = this.state.playlist.currentPlay,
+    show = this.state.playlist.show,
+    random = this.state.playlist.random,
+    repeat = this.state.playlist.repeat
+  }) {
     this.setState({
       playlist: update(
         this.state.playlist, {
-          show: { $set: !this.state.playlist.show }
+          data: { $set: data },
+          currentPlay: { $set: currentPlay },
+          show: { $set: show },
+          random: { $set: random },
+          repeat: { $set: repeat },
         }
       )
     });
+  }
+  handlePlaylistBtn() {
+    this.changeState_Playlist({ show: !this.state.playlist.show });
   }
   nextMusic() {
     let currentNum = Number(this.state.playlist.currentPlay),
@@ -372,31 +371,13 @@ class App extends Component {
     if (!this.state.playlist.data[num]) return;
 
     this.changeState_audioData(this.state.playlist.data[num].audioData);
-    this.setState({
-      playlist: update(
-        this.state.playlist, {
-          currentPlay: { $set: num }
-        }
-      )
-    });
+    this.changeState_Playlist({ currentPlay: num });
   }
   randomMusic() {
-    this.setState({
-      playlist: update(
-        this.state.playlist, {
-          random: { $set: !this.state.playlist.random }
-        }
-      )
-    })
+    this.changeState_Playlist({ random: !this.state.playlist.random });
   }
   repeatMusic() {
-    this.setState({
-      playlist: update(
-        this.state.playlist, {
-          repeat: { $set: !this.state.playlist.repeat }
-        }
-      )
-    })
+    this.changeState_Playlist({ repeat: !this.state.playlist.repeat });
   }
   deleteMusic(num) {
     let currentPlay = this.state.playlist.currentPlay;
@@ -404,7 +385,7 @@ class App extends Component {
     this.setState({
       playlist: update(
         this.state.playlist, {
-          data: { $splice: [[num, 1]] },          
+          data: { $splice: [[num, 1]] },
           currentPlay: { $set: currentPlay >= num ? currentPlay - 1 : currentPlay }
         }
       )
