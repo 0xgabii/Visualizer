@@ -404,8 +404,8 @@ class App extends Component {
     this.setState({
       playlist: update(
         this.state.playlist, {
-          data: { $splice: [[num, 1]] },
-          currentPlay: { $set: currentPlay > num ? currentPlay - 1 : currentPlay }
+          data: { $splice: [[num, 1]] },          
+          currentPlay: { $set: currentPlay >= num ? currentPlay - 1 : currentPlay }
         }
       )
     });
