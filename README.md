@@ -15,6 +15,7 @@ Made With **React**
 
 ## Used
 
+- siiimple-toast ([github](https://github.com/gomonk3037/siiimple-Toast), [npm](https://www.npmjs.com/package/siiimple-toast))
 - axios ([github](https://github.com/mzabriskie/axios), [npm](https://www.npmjs.com/package/axios))
 - color-thief-standalone ([github](https://github.com/lokesh/color-thief), [npm](https://www.npmjs.com/package/color-thief-standalone)) : extract color from dataImage
 - jsmediatags ([github](https://github.com/aadsm/jsmediatags), [npm](https://www.npmjs.com/package/jsmediatags))  : get ID3 tags from Audio MetaData

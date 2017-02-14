@@ -11,7 +11,7 @@ import jsmediatags from 'jsmediatags';
 //get main/sub color from dataImage
 import ColorThief from 'color-thief-standalone';
 // toast 
-import { Toast } from './Toast';
+import siiimpleToast from 'siiimple-toast';
 
 class App extends Component {
   constructor(props) {
@@ -89,6 +89,9 @@ class App extends Component {
     this.anMic.smoothingTimeConstant = 0.7;
     this.anMic.fftSize = 2048;
     this.frequencyData = new Uint8Array(this.anMic.frequencyBinCount);
+
+    // Toast Settiings
+    this.toast = new siiimpleToast();
   }
   useMic() {
     navigator.getUserMedia({ audio: true }, (stream) => {
@@ -183,7 +186,7 @@ class App extends Component {
 
     // update playlist state;
     const whenFinished = () => {
-      if (files.length > 0) Toast(`${files.length} songs have been added to the playlist`, 'default');
+      if (files.length > 0) this.toast.message(`${files.length} songs have been added to the playlist`);
 
       this.setState({
         playlist: update(
@@ -308,7 +311,7 @@ class App extends Component {
   // ajax request to Find Lyrics
   getLyrics(artist, title) {
     // alert
-    if (!this.state.lyrics.data) Toast('Only lyrics in English can be searched', 'default');
+    if (!this.state.lyrics.data) this.toast.message('Only lyrics in English can be searched');
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
       .then((response) => {
         let data = response.data;
@@ -317,9 +320,9 @@ class App extends Component {
         this.changeState_Lyrics({ data: data ? data.split('\n') : this.state.lyrics.data });
 
         if (!data) {
-          Toast('Lyrics Not Found!', 'default');
+          this.toast.message('Lyrics Not Found!');
         } else {
-          Toast('Lyrics Found!', 'success');
+          this.toast.success('Lyrics Found!');
           // update State
           this.changeState_Lyrics({
             show: true,
