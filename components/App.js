@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 import update from 'react-addons-update';
 import axios from 'axios';
+// get audio file info
+import jsmediatags from 'jsmediatags';
+// get main/sub color from dataImage
+import ColorThief from 'color-thief-standalone';
+// toast
+import siiimpleToast from 'siiimple-toast';
+
 import Visualizer from './Visualizer';
 import Controller from './Controller';
 import Header from './Header';
 import Lyrics from './Lyrics';
 import Playlist from './Playlist/Playlist';
-//get audio file info
-import jsmediatags from 'jsmediatags';
-//get main/sub color from dataImage
-import ColorThief from 'color-thief-standalone';
-// toast 
-import siiimpleToast from 'siiimple-toast';
 
 class App extends Component {
   constructor(props) {
@@ -23,33 +24,33 @@ class App extends Component {
         radius: 200,
         objWidth: 4,
         objCount: 150,
-        data: []
+        data: [],
       },
       audioData: {
         src: '',
         album: '',
         title: '',
         artist: '',
-        cover: ''
+        cover: '',
       },
       colors: {
         main: 'rgb(27, 30, 43)',
-        sub: 'rgb(229, 206, 208)'
+        sub: 'rgb(229, 206, 208)',
       },
       lyrics: {
         data: [],
         scroll: 0.5,
         show: false,
-        find: false
+        find: false,
       },
       playlist: {
         data: [],
         currentPlay: 0,
         show: false,
         random: false,
-        repeat: false
-      }
-    }
+        repeat: false,
+      },
+    };
     this.handlePlay = this.handlePlay.bind(this);
     this.fileChange = this.fileChange.bind(this);
     this.visualizing = this.visualizing.bind(this);
@@ -60,10 +61,10 @@ class App extends Component {
     this.handleFindLyricsBtn = this.handleFindLyricsBtn.bind(this);
     this.lyricsMounted = this.lyricsMounted.bind(this);
     this.wheelEvent = this.wheelEvent.bind(this);
-    this.changeState_colors = this.changeState_colors.bind(this);
-    this.changeState_audioData = this.changeState_audioData.bind(this);
-    this.changeState_Lyrics = this.changeState_Lyrics.bind(this);
-    this.changeState_Playlist = this.changeState_Playlist.bind(this);
+    this.changeStateColors = this.changeStateColors.bind(this);
+    this.changeStateAudioData = this.changeStateAudioData.bind(this);
+    this.changeStateLyrics = this.changeStateLyrics.bind(this);
+    this.changeStatePlaylist = this.changeStatePlaylist.bind(this);
     this.handlePlaylistBtn = this.handlePlaylistBtn.bind(this);
     this.changeMusic = this.changeMusic.bind(this);
     this.nextMusic = this.nextMusic.bind(this);
@@ -95,17 +96,17 @@ class App extends Component {
   }
   useMic() {
     navigator.getUserMedia({ audio: true }, (stream) => {
-      const audioContext = this.acMic,
-        analyser = this.anMic,
-        microphone = audioContext.createMediaStreamSource(stream);
+      const audioContext = this.acMic;
+      const analyser = this.anMic;
+      const microphone = audioContext.createMediaStreamSource(stream);
 
       microphone.connect(analyser);
       analyser.connect(audioContext.destination);
-    }, (error) => { console.log(error); });
+    }, (error) => { console.error(error); });
   }
   visualizing() {
-    let frequencyData = this.frequencyData,
-      analyser = this.analyser;
+    const frequencyData = this.frequencyData;
+    const analyser = this.analyser;
 
     requestAnimationFrame(this.visualizing);
 
@@ -116,73 +117,22 @@ class App extends Component {
       visualizeSet: update(
         this.state.visualizeSet, {
           data: { $set: frequencyData }
-        }
-      )
+        },
+      ),
     });
   }
   handlePlay(e) {
-    const audioContext = this.audioContext,
-      source = audioContext.createMediaElementSource(e.target),
-      analyser = this.analyser;
+    const audioContext = this.audioContext;
+    const source = audioContext.createMediaElementSource(e.target);
+    const analyser = this.analyser;
 
     source.connect(analyser);
     analyser.connect(audioContext.destination);
   }
   fileChange(e) {
-    const files = e.target.files,
-      playlist = this.state.playlist.data;
+    const files = e.target.files;
+    const playlist = this.state.playlist.data;
 
-    for (let i = 0; i < files.length; i++) {
-      let file = files[i],
-        dataFile = URL.createObjectURL(file);
-
-      // wrapping Ojbect
-      const music = {};
-
-      // read Audio metaData
-      jsmediatags.read(file, {
-        onSuccess: tag => {
-          let tags = tag.tags,
-            album = tags.album,
-            title = tags.title,
-            artist = tags.artist,
-            cover = tags.picture;
-
-          if (cover) {
-            // metaData to Image 
-            let base64String = "";
-            cover.data.forEach(data => { base64String += String.fromCharCode(data) });
-            // base64 dataImage
-            cover = "data:" + cover.format + ";base64," + window.btoa(base64String);
-          }
-
-          //set ojbect audioData
-          music.audioData = {
-            src: dataFile,
-            album: album,
-            title: title,
-            artist: artist,
-            cover: cover
-          }
-
-          // push to array
-          playlist.push(music);
-
-          // when finished
-          if (i == files.length - 1) whenFinished();
-        },
-        // if do not have ID3 tags
-        onError: error => {
-          music.audioData = {
-            src: dataFile
-          }
-          playlist.push(music);
-
-          // when finished
-          if (i == files.length - 1) whenFinished();
-        }
-      });
-    }// end for Loop  
 
     // update playlist state;
     const whenFinished = () => {
@@ -191,37 +141,91 @@ class App extends Component {
       this.setState({
         playlist: update(
           this.state.playlist, {
-            data: { $set: playlist }
-          }
-        )
+            data: { $set: playlist },
+          },
+        ),
       });
 
-      if (!this.state.audioData.src) this.changeState_audioData(playlist[this.state.playlist.currentPlay].audioData);
-    }
+      for (let i = 0; i < files.length; i += 1) {
+        const file = files[i];
+        const dataFile = URL.createObjectURL(file);
+
+        // wrapping Ojbect
+        const music = {};
+
+        // read Audio metaData
+        jsmediatags.read(file, {
+          onSuccess: (tag) => {
+            const tags = tag.tags;
+            const album = tags.album;
+            const title = tags.title;
+            const artist = tags.artist;
+            let cover = tags.picture;
+
+            if (cover) {
+              // metaData to image
+              let base64String = '';
+              cover.data.forEach((data) => { base64String += String.fromCharCode(data); });
+              // base64 dataImage
+              cover = `data:${cover.format};base64,${window.btoa(base64String)}`;
+            }
+
+            // set ojbect audioData
+            music.audioData = {
+              src: dataFile,
+              album: album,
+              title: title,
+              artist: artist,
+              cover: cover,
+            }
+
+            // push to array
+            playlist.push(music);
+
+            // when finished
+            if (i === files.length - 1) whenFinished();
+          },
+          // if do not have ID3 tags
+          onError: () => {
+            music.audioData = {
+              src: dataFile,
+            };
+            playlist.push(music);
+
+            // when finished
+            if (i === files.length - 1) whenFinished();
+          },
+        });
+      }// end for   
+
+      if (!this.state.audioData.src) {
+        this.changeStateAudioData(playlist[this.state.playlist.currentPlay].audioData);
+      }
+    };
   }
-  changeState_colors(image) {
+  changeStateColors(image) {
     if (image) {
       const coverImage = new Image();
       coverImage.src = image;
       coverImage.onload = () => {
-        //read Color from dataImage
-        const colorThief = new ColorThief(),
-          colorArray = colorThief.getPalette(coverImage, 2);
+        // read Color from dataImage
+        const colorThief = new ColorThief();
+        const colorArray = colorThief.getPalette(coverImage, 2);
 
         this.setState({
           colors: update(
             this.state.colors, {
-              main: { $set: 'rgb(' + colorArray[1].join(',') + ')' },
-              sub: { $set: 'rgb(' + colorArray[0].join(',') + ')' }
-            }
-          )
+              main: { $set: `rgb(${colorArray[1].join(',')})` },
+              sub: { $set: `rgb(${colorArray[0].join(',')})` },
+            },
+          ),
         });
       };
     } else {
       this.setState({ colors: this.initialColor });
     }
   }
-  changeState_audioData(obj) {
+  changeStateAudioData(obj) {
     this.setState({
       audioData: update(
         this.state.audioData, {
@@ -230,8 +234,8 @@ class App extends Component {
           title: { $set: obj.title },
           artist: { $set: obj.artist },
           cover: { $set: obj.cover },
-        }
-      )
+        },
+      ),
     }, () => {
       // reset lyrics State
       this.setState({
@@ -239,21 +243,21 @@ class App extends Component {
           this.state.lyrics, {
             data: { $set: [] },
             show: { $set: false },
-            scroll: { $set: 0.5 }
-          }
-        )
+            scroll: { $set: 0.5 },
+          },
+        ),
       });
       // find lyrics
       this.getLyrics(this.state.audioData.artist, this.state.audioData.title);
-      // change Colors      
-      this.changeState_colors(this.state.audioData.cover);
+      // change Colors
+      this.changeStateColors(this.state.audioData.cover);
     });
   }
-  changeState_Lyrics({
+  changeStateLyrics({
     data = this.state.lyrics.data,
     scroll = this.state.lyrics.scroll,
     show = this.state.lyrics.show,
-    find = this.state.lyrics.find
+    find = this.state.lyrics.find,
   }) {
     this.setState({
       lyrics: update(
@@ -262,8 +266,8 @@ class App extends Component {
           scroll: { $set: scroll },
           show: { $set: show },
           find: { $set: find },
-        }
-      )
+        },
+      ),
     });
   }
   // when lyrics Component Mounted
@@ -274,37 +278,38 @@ class App extends Component {
   }
   wheelEvent(e) {
     // e.deltaY > 0 ? Down : Up
-    let deltaY = e.deltaY > 0 ? -3 : 3,
-      currentScroll = this.state.lyrics.scroll;
+    const deltaY = e.deltaY > 0 ? -3 : 3;
+    const currentScroll = this.state.lyrics.scroll;
 
-    if (currentScroll + deltaY <= -100 || currentScroll + deltaY >= 1)
-      this.changeState_Lyrics({ scroll: currentScroll });
-    else
-      this.changeState_Lyrics({ scroll: currentScroll + deltaY });
+    if (currentScroll + deltaY <= -100 || currentScroll + deltaY >= 1) {
+      this.changeStateLyrics({ scroll: currentScroll });
+    } else {
+      this.changeStateLyrics({ scroll: currentScroll + deltaY });
+    }
   }
   handleLyricsBtn() {
-    this.changeState_Lyrics({ show: !this.state.lyrics.show });
+    this.changeStateLyrics({ show: !this.state.lyrics.show });
   }
   colorReversal() {
     this.setState({
       colors: update(
         this.state.colors, {
           main: { $set: this.state.colors.sub },
-          sub: { $set: this.state.colors.main }
-        }
-      )
+          sub: { $set: this.state.colors.main },
+        },
+      ),
     });
   }
   // show form
   handleFindLyricsBtn() {
-    this.changeState_Lyrics({ find: !this.state.lyrics.find });
+    this.changeStateLyrics({ find: !this.state.lyrics.find });
   }
   // submit form
   findLyrics(e) {
     e.preventDefault();
 
-    let artist = e.target.elements[0].value,
-      title = e.target.elements[1].value;
+    const artist = e.target.elements[0].value;
+    const title = e.target.elements[1].value;
 
     this.getLyrics(artist, title);
   }
@@ -314,29 +319,29 @@ class App extends Component {
     if (!this.state.lyrics.data) this.toast.message('Only lyrics in English can be searched');
     axios.get(`https://young-savannah-79010.herokuapp.com/lyrics/${artist}/${title}`)
       .then((response) => {
-        let data = response.data;
+        const data = response.data;
 
         // update State
-        this.changeState_Lyrics({ data: data ? data.split('\n') : this.state.lyrics.data });
+        this.changeStateLyrics({ data: data ? data.split('\n') : this.state.lyrics.data });
 
         if (!data) {
           this.toast.message('Lyrics Not Found!');
         } else {
           this.toast.success('Lyrics Found!');
           // update State
-          this.changeState_Lyrics({
+          this.changeStateLyrics({
             show: true,
-            find: false
+            find: false,
           });
         }
-      }).catch((error) => { console.log(error); });
+      });
   }
-  changeState_Playlist({
+  changeStatePlaylist({
     data = this.state.playlist.data,
     currentPlay = this.state.playlist.currentPlay,
     show = this.state.playlist.show,
     random = this.state.playlist.random,
-    repeat = this.state.playlist.repeat
+    repeat = this.state.playlist.repeat,
   }) {
     this.setState({
       playlist: update(
@@ -346,23 +351,25 @@ class App extends Component {
           show: { $set: show },
           random: { $set: random },
           repeat: { $set: repeat },
-        }
-      )
+        },
+      ),
     });
   }
   handlePlaylistBtn() {
-    this.changeState_Playlist({ show: !this.state.playlist.show });
+    this.changeStatePlaylist({ show: !this.state.playlist.show });
   }
   nextMusic() {
-    let currentNum = Number(this.state.playlist.currentPlay),
-      num = currentNum + 1;  // default 
+    const currentNum = Number(this.state.playlist.currentPlay);
+    let num = currentNum + 1;  // default
 
-    // random    
-    if (this.state.playlist.random)
+    // random
+    if (this.state.playlist.random) {
       num = Math.floor(Math.random() * this.state.playlist.data.length);
+    }
     // repeat
-    if (this.state.playlist.repeat)
+    if (this.state.playlist.repeat) {
       num = currentNum;
+    }
 
     this.changeMusic(num);
   }
@@ -370,36 +377,38 @@ class App extends Component {
     this.changeMusic(Number(this.state.playlist.currentPlay) - 1);
   }
   changeMusic(num) {
-    if (num === this.state.playlist.data.length) num = 0;
-    if (!this.state.playlist.data[num]) return;
+    let number = num;
 
-    this.changeState_audioData(this.state.playlist.data[num].audioData);
-    this.changeState_Playlist({ currentPlay: num });
+    if (num === this.state.playlist.data.length) number = 0;
+    if (!this.state.playlist.data[number]) return;
+
+    this.changeStateAudioData(this.state.playlist.data[number].audioData);
+    this.changeStatePlaylist({ currentPlay: number });
   }
   randomMusic() {
-    this.changeState_Playlist({ random: !this.state.playlist.random });
+    this.changeStatePlaylist({ random: !this.state.playlist.random });
   }
   repeatMusic() {
-    this.changeState_Playlist({ repeat: !this.state.playlist.repeat });
+    this.changeStatePlaylist({ repeat: !this.state.playlist.repeat });
   }
   deleteMusic(num) {
-    let currentPlay = this.state.playlist.currentPlay;
+    const currentPlay = this.state.playlist.currentPlay;
 
     this.setState({
       playlist: update(
         this.state.playlist, {
           data: { $splice: [[num, 1]] },
-          currentPlay: { $set: currentPlay >= num ? currentPlay - 1 : currentPlay }
-        }
-      )
+          currentPlay: { $set: currentPlay >= num ? currentPlay - 1 : currentPlay },
+        },
+      ),
     });
   }
   render() {
     const styles = {
       color: this.state.colors.sub,
       backgroundColor: this.state.colors.main,
-      backgroundImage: this.state.audioData.cover
-    }
+      backgroundImage: this.state.audioData.cover,
+    };
     return (
       <div className="wrapper" style={styles} >
         <Header />
@@ -454,5 +463,4 @@ class App extends Component {
     );
   }
 }
-
 export default App;
