@@ -102,7 +102,7 @@ class App extends Component {
 
       microphone.connect(analyser);
       analyser.connect(audioContext.destination);
-    }, (error) => { console.error(error); });
+    }, () => { });
   }
   visualizing() {
     const frequencyData = this.frequencyData;
@@ -116,7 +116,7 @@ class App extends Component {
     this.setState({
       visualizeSet: update(
         this.state.visualizeSet, {
-          data: { $set: frequencyData }
+          data: { $set: frequencyData },
         },
       ),
     });
@@ -157,27 +157,27 @@ class App extends Component {
         jsmediatags.read(file, {
           onSuccess: (tag) => {
             const tags = tag.tags;
-            const album = tags.album;
-            const title = tags.title;
-            const artist = tags.artist;
-            let cover = tags.picture;
+            const tagAlbum = tags.album;
+            const tagTitle = tags.title;
+            const tagArtist = tags.artist;
+            let tagCover = tags.picture;
 
-            if (cover) {
+            if (tagCover) {
               // metaData to image
               let base64String = '';
-              cover.data.forEach((data) => { base64String += String.fromCharCode(data); });
+              tagCover.data.forEach((data) => { base64String += String.fromCharCode(data); });
               // base64 dataImage
-              cover = `data:${cover.format};base64,${window.btoa(base64String)}`;
+              tagCover = `data:${cover.format};base64,${window.btoa(base64String)}`;
             }
 
             // set ojbect audioData
             music.audioData = {
               src: dataFile,
-              album: album,
-              title: title,
-              artist: artist,
-              cover: cover,
-            }
+              album: tagAlbum,
+              title: tagTitle,
+              artist: tagArtist,
+              cover: tagCover,
+            };
 
             // push to array
             playlist.push(music);
@@ -196,7 +196,7 @@ class App extends Component {
             if (i === files.length - 1) whenFinished();
           },
         });
-      }// end for   
+      }// end for
 
       if (!this.state.audioData.src) {
         this.changeStateAudioData(playlist[this.state.playlist.currentPlay].audioData);

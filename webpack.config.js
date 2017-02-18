@@ -1,3 +1,4 @@
+/* eslint-disable */
 module.exports = {
     entry: './public/index.js',
 
@@ -16,7 +17,6 @@ module.exports = {
     },
     module: {
         preLoaders: [
-            // Javascript
             { test: /\.js?$/, loader: 'eslint', exclude: /node_modules/ }
         ],
         loaders: [
