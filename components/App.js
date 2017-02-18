@@ -102,7 +102,7 @@ class App extends Component {
 
       microphone.connect(analyser);
       analyser.connect(audioContext.destination);
-    }, () => { });
+    }, (error) => { });
   }
   visualizing() {
     const frequencyData = this.frequencyData;
@@ -133,7 +133,6 @@ class App extends Component {
     const files = e.target.files;
     const playlist = this.state.playlist.data;
 
-
     // update playlist state;
     const whenFinished = () => {
       if (files.length > 0) this.toast.message(`${files.length} songs have been added to the playlist`);
@@ -146,62 +145,62 @@ class App extends Component {
         ),
       });
 
-      for (let i = 0; i < files.length; i += 1) {
-        const file = files[i];
-        const dataFile = URL.createObjectURL(file);
-
-        // wrapping Ojbect
-        const music = {};
-
-        // read Audio metaData
-        jsmediatags.read(file, {
-          onSuccess: (tag) => {
-            const tags = tag.tags;
-            const tagAlbum = tags.album;
-            const tagTitle = tags.title;
-            const tagArtist = tags.artist;
-            let tagCover = tags.picture;
-
-            if (tagCover) {
-              // metaData to image
-              let base64String = '';
-              tagCover.data.forEach((data) => { base64String += String.fromCharCode(data); });
-              // base64 dataImage
-              tagCover = `data:${cover.format};base64,${window.btoa(base64String)}`;
-            }
-
-            // set ojbect audioData
-            music.audioData = {
-              src: dataFile,
-              album: tagAlbum,
-              title: tagTitle,
-              artist: tagArtist,
-              cover: tagCover,
-            };
-
-            // push to array
-            playlist.push(music);
-
-            // when finished
-            if (i === files.length - 1) whenFinished();
-          },
-          // if do not have ID3 tags
-          onError: () => {
-            music.audioData = {
-              src: dataFile,
-            };
-            playlist.push(music);
-
-            // when finished
-            if (i === files.length - 1) whenFinished();
-          },
-        });
-      }// end for
-
       if (!this.state.audioData.src) {
         this.changeStateAudioData(playlist[this.state.playlist.currentPlay].audioData);
       }
     };
+
+    for (let i = 0; i < files.length; i += 1) {
+      const file = files[i];
+      const dataFile = URL.createObjectURL(file);
+
+      // wrapping Ojbect
+      const music = {};
+
+      // read Audio metaData
+      jsmediatags.read(file, {
+        onSuccess: (tag) => {
+          const tags = tag.tags;
+          const tagAlbum = tags.album;
+          const tagTitle = tags.title;
+          const tagArtist = tags.artist;
+          let tagCover = tags.picture;
+
+          if (tagCover) {
+            // metaData to image
+            let base64String = '';
+            tagCover.data.forEach((data) => { base64String += String.fromCharCode(data); });
+            // base64 dataImage
+            tagCover = `data:${tagCover.format};base64,${window.btoa(base64String)}`;
+          }
+
+          // set ojbect audioData
+          music.audioData = {
+            src: dataFile,
+            album: tagAlbum,
+            title: tagTitle,
+            artist: tagArtist,
+            cover: tagCover,
+          };
+
+          // push to array
+          playlist.push(music);
+
+          // when finished
+          if (i === files.length - 1) whenFinished();
+        },
+        // if do not have ID3 tags
+        onError: () => {
+          music.audioData = {
+            src: dataFile,
+          };
+          playlist.push(music);
+
+          // when finished
+          if (i === files.length - 1) whenFinished();
+        },
+      });
+    }// end for
   }
   changeStateColors(image) {
     if (image) {
