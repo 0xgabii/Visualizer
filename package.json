@@ -22,7 +22,7 @@
     "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
-    "axios": "^0.15.3",
+    "axios": "^0.19.0",
     "color-thief-standalone": "^1.0.3",
     "jsmediatags": "^3.3.2",
     "react": "^15.4.2",
