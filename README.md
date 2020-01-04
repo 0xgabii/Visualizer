@@ -8,7 +8,7 @@
 Music player with audio visualization & find lyrics
 
 ### Demo
-- on web: [https://gomonk3037.github.io/Visualizer/](https://gomonk3037.github.io/Visualizer/)
+- on web: [https://ooyun.dev/Visualizer/](https://ooyun.dev/Visualizer/)
 - on youtube video: [https://www.youtube.com/watch?v=4ZbhVXzQ2rE](https://www.youtube.com/watch?v=4ZbhVXzQ2rE)
 
 ## Used
